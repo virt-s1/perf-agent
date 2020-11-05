@@ -1,0 +1,31 @@
+---
+# tasks file for install_packages
+#
+
+- name: install rhel packages
+  block:
+    - name: install yum packages
+      yum:
+        name: "{{ item }}"
+        state: latest
+      loop: "{{ config_info.package_list }}"
+  when: config_info.os_vendor == "rhel"
+
+- name: install amazon packages
+  block:
+    - name: install yum packages
+      yum:
+        name: "{{ item }}"
+        state: latest
+      loop: "{{ config_info.package_list }}"
+  when: config_info.os_vendor == "amazon"
+
+- name: ubuntu intall
+  block:
+    - name: apt update
+      command: apt -q update
+
+    - name: install apt packages
+      command: "apt -q -y install {{ item }}"
+      loop: "{{ config_info.package_list }}"
+  when: config_info.os_vendor == "ubuntu"

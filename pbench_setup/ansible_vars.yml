@@ -1,0 +1,13 @@
+---
+config_info:
+  system_type: local
+  os_vendor: rhel
+  package_install: 1
+  package_list:
+    - zip
+    - unzip
+    - bc
+    - numactl
+    - time
+  pbench_install: 1
+  dev_env_install: 1

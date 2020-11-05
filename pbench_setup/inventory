@@ -1,0 +1,2 @@
+#host1 ansible_host=54.201.247.22
+#host2 ansible_host=54.202.189.64 ansible_ssh_extra_args="-R 8080:localhost:3128"

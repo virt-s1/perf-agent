@@ -1,0 +1,93 @@
+---
+# tasks file for install_tools
+
+- name: copy getconf.py missing command for aws
+  copy:
+    src: "{{ working_dir }}/bin/getconf.py"
+    dest: /usr/bin
+    mode: "0755"
+
+- set_fact:
+    pbench_configuration_environment: "ec2"
+  when: config_info.system_type != "local"
+
+- set_fact:
+    pbench_configuration_environment: "production"
+  when: config_info.system_type == "local"
+
+- name: Configure the pbench repo
+  template: src={{ item }}.j2 dest=/etc/yum.repos.d/{{ item }} owner=root group=root mode=0644
+  with_items:
+    - pbench.repo
+    - pbench-test.repo
+
+- name: Install epel repo file
+  yum:
+    name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+    state: present
+
+- name: Install pbench-agent and pbench-sysstat RPMs
+  package:
+    name:
+      - pbench-agent
+      - pbench-sysstat
+    state: latest
+
+- name: Copy local pbench-agent.cfg - cloud
+  block:
+    - name: Copy pbench-agent.cfg
+      copy:
+        src: "{{ working_dir }}/config/pbench-agent-cloud.cfg"
+        dest: /opt/pbench-agent/config/pbench-agent.cfg
+        mode: 0444
+        owner: root
+        group: root
+  when: config_info.system_type != "local"
+
+- name: Copy local pbench-agent.cfg - local
+  block:
+    - name: Copy pbench-agent.cfg
+      copy:
+        src: "{{ working_dir }}/config/pbench-agent-production.cfg"
+        dest: /opt/pbench-agent/config/pbench-agent.cfg
+        mode: 0444
+        owner: root
+        group: root
+  when: config_info.system_type == "local"
+
+- name: Copy external id_rsa in place for clouds
+  block:
+    - name: Copy id_rsa
+      copy:
+        src: "{{ working_dir }}/config/id_rsa.cloud"
+        dest: "/opt/pbench-agent/id_rsa"
+        mode: 0600
+  when: config_info.system_type != "local"
+
+- name: Copy external id_rsa in place for local systems
+  block:
+    - name: Copy id_rsa
+      copy:
+        src: "{{ working_dir }}/config/id_rsa"
+        dest: "/opt/pbench-agent/id_rsa"
+        mode: 0600
+  when: config_info.system_type == "local"
+
+#
+# No need `sudo -i` in my case, already become root.
+#
+- name: install pbench step 2
+  command: bash -l /opt/pbench-agent/util-scripts/pbench-register-tool-set
+
+#
+# This is a temporary hack thanks to the removal of auto-installing packages
+# in recent versions of pbench.  We need to fix this to only install what's
+# needed, but for now just go with it...
+#
+- name: install pbench benchmarks
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - uperf
+    - fio
