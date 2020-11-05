@@ -1,0 +1,30 @@
+---
+coprdistro: "{{ 'epel-8-$basearch'
+   if ansible_distribution == 'RedHat' and
+   ansible_distribution_major_version == '8'
+   else
+   'epel-7-$basearch'
+   if ansible_distribution == 'RedHat' and
+   ansible_distribution_major_version == '7'
+   else
+   'epel-6-$basearch'
+   if ansible_distribution == 'RedHat' and
+   ansible_distribution_major_version == '7'
+   else
+   'fedora-$releasever-$basearch'
+   if ansible_distribution == 'Fedora'
+   else
+   'unknown'
+   }}"
+
+baseurl: "https://copr-be.cloud.fedoraproject.org/results/ndokos/pbench/{{ coprdistro }}/"
+
+testbaseurl: "https://copr-be.cloud.fedoraproject.org/results/ndokos/pbench-test/{{ coprdistro }}/"
+
+gpgkey: "{{ 'https://copr-be.cloud.fedoraproject.org/results/ndokos/pbench/pubkey.gpg' }}"
+
+testgpgkey: "{{ 'https://copr-be.cloud.fedoraproject.org/results/ndokos/pbench-test/pubkey.gpg' }}"
+
+gpgcheck: "{{ 1 }}"
+
+test_enabled: false

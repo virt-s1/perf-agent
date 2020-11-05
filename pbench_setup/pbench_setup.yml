@@ -1,0 +1,37 @@
+#
+# Install the packages.
+#
+- hosts: all
+  become: true
+  become_user: root
+  vars_files:
+    - ansible_vars.yml
+
+  gather_facts: yes
+  tasks:
+    - name: package installation
+      block:
+        - name: install_pkgs
+          include_role:
+            name: install_packages
+      when:
+        - config_info.package_install == 1
+        - config_info.package_list != None
+
+    - name: pbench installation
+      block:
+        - name: Gather the rpm package facts
+          package_facts:
+            manager: auto
+        - name: pbench installation
+          include_role:
+            name: install_pbench
+      when: config_info.pbench_install == 1
+
+    - name: dev environment for uperf installation
+      block:
+        - include_role:
+            name: install_dev_environment
+      when:
+        - config_info.dev_env_install == 1
+        - config_info.os_vendor == "rhel"
