@@ -1,0 +1,33 @@
+# Syntax:
+#   $target : expands to the fio target file
+#   $@ : expands to the value of the option as passed to
+#        pbench-fio
+#   $? : empty value needs to be overwriten by pbench-fio
+#
+# For python2 without the latest configparser installed, lines
+# cannot be indented.
+
+[global]
+bs = $@
+runtime = 30
+ioengine = libaio
+iodepth = $?
+direct = 1
+sync = 0
+time_based = 1
+clocksource = clock_gettime
+ramp_time = 5
+write_bw_log = fio
+write_iops_log = fio
+write_lat_log = fio
+log_avg_msec = 1000
+write_hist_log = fio
+log_hist_msec = 10000
+group_reporting = 1
+
+[job-$target]
+filename = $target
+rw = $@
+size = 4096M
+numjobs = $?
+
