@@ -4,11 +4,28 @@
 - hosts: all
   become: true
   become_user: root
+  become_method: sudo
   vars_files:
     - ansible_vars.yml
 
   gather_facts: yes
   tasks:
+    - name: environment configuration (Azure)
+      block:
+        - name: install dnf-utils
+          yum:
+            name: dnf-utils
+            state: latest
+        - name: check if private image
+          stat:
+            path: /etc/yum.repos.d/rhel.repo
+          register: st
+        - name: enable private repos
+          command: yum-config-manager --enable rhel-appstream rhel-base
+          when: st.stat.exists
+      when:
+        - config_info.system_type == "azure"
+
     - name: package installation
       block:
         - name: install_pkgs
