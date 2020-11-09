@@ -21,12 +21,16 @@ config_info:
 ```
 
 The `system_type` can be one of the following values:
-- local     for the local VMs inside Red Hat network;
-- aws       for the AWS instances;
-- azure     for the Azure instances;
+- local - run for local VMs inside Red Hat network;
+- aws   - run for AWS instances;
+- azure - run for the Azure instances;
+
 The `os_vendor` can only be `rhel` at this moment.
-Set `package_install` as `1` if you want to install additional packages and provision `package_list` according to your need, other wise set it as `0`.
+
+Set `package_install` as `1` and provision `package_list` according to your needs if you want to install additional packages, other wise set it as `0`.
+
 Set `pbench_install` as `1` to perform pbench installation, other wise set it as `0`.
+
 Set `dev_env_install` as `1` to install `@Development tools` for uperf, other wise set it as `0`.
 
 ## Configure ansible.cfg
@@ -56,4 +60,4 @@ When using private image on clouds, you might consider enabling the "ssh reverse
 
 ## Execute setup.sh
 
-Then you can start the setup process by executing `./setup.sh`.
+Finally, you can execute `./setup.sh` to start the setup process.
