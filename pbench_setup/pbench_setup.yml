@@ -12,6 +12,8 @@
   tasks:
     - name: environment configuration (Azure)
       block:
+        - name: workaround the compability issue of Azure RHUI EUS repos
+          script: ./bin/azure_rhui_eus_workaround.sh
         - name: install yum-utils
           yum:
             name: yum-utils
