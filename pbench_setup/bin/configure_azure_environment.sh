@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Description:
+# Description: Configure the Azure environment for pbench setup.
 
 function switch_back_to_noneus() {
     # Switch a RHEL 7.x/8.x VM back to non-EUS.
@@ -15,14 +15,14 @@ function switch_back_to_noneus() {
     [ -z $rhel_ver ] && echo "EUS repo was not installed or not supported." && exit 1
 
     # remove EUS repos
-    yum --disablerepo='*' remove 'rhui-azure-rhel*-eus' -y
+    yum --disablerepo='*' remove -y 'rhui-azure-rhel*-eus'
 
     # remove the version lock
     mv -f /etc/yum/vars/releasever /etc/yum/vars/releasever.bak
 
     # get the regular repos config file and add non-EUS repos
     yum --config="https://rhelimage.blob.core.windows.net/repositories/rhui-microsoft-azure-rhel${rhel_ver}.config" \
-        install "rhui-azure-rhel${rhel_ver}"
+        install -y "rhui-azure-rhel${rhel_ver}"
 }
 
 function enable_codeready_repo() {
@@ -44,16 +44,16 @@ function enable_private_repos() {
 
 # for instance with private repos
 if [ -e /etc/yum.repos.d/rhel.repo ]; then
-    echo "Enable private repos."
+    echo "Private image: Enable private repos."
     install_yum_utils
     enable_private_repos
     exit 0
 fi
 
 # for instance with EUS repos
-rpm -qa | grep -q "rhui-azure-rhel*-eus"
+rpm -qa | grep -q "rhui-azure-rhel[0-9]-eus"
 if [ "$?" = "0" ]; then
-    echo "Switch back to non-EUS and enable CodeReday repos."
+    echo "EUS image: Switch back to non-EUS and enable CodeReday repos."
     switch_back_to_noneus
     install_yum_utils
     enable_codeready_repo
@@ -61,9 +61,9 @@ if [ "$?" = "0" ]; then
 fi
 
 # for instance with non-EUS repos
-rpm -qa | grep -v "rhui-azure-rhel*-eus" | grep -q "rhui-azure-rhel"
+rpm -qa | grep -v "eus" | grep -q "rhui-azure-rhel"
 if [ "$?" = "0" ]; then
-    echo "Enable CodeReday repos."
+    echo "Non-EUS image: Enable CodeReday repos."
     install_yum_utils
     enable_codeready_repo
     exit 0
