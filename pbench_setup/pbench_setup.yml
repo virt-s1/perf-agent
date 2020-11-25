@@ -10,21 +10,8 @@
 
   gather_facts: yes
   tasks:
-    - name: environment configuration (Azure)
-      block:
-        - name: workaround the compability issue of Azure RHUI EUS repos
-          script: ./bin/azure_rhui_eus_workaround.sh
-        - name: install yum-utils
-          yum:
-            name: yum-utils
-            state: latest
-        - name: check if private image
-          stat:
-            path: /etc/yum.repos.d/rhel.repo
-          register: st
-        - name: enable private repos
-          command: yum-config-manager --enable rhel-appstream rhel-base
-          when: st.stat.exists
+    - name: Configure environment (Azure)
+      script: ./bin/configure_azure_environment.sh
       when:
         - config_info.system_type == "azure"
 
