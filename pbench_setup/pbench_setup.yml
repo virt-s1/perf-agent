@@ -4,11 +4,17 @@
 - hosts: all
   become: true
   become_user: root
+  become_method: sudo
   vars_files:
     - ansible_vars.yml
 
   gather_facts: yes
   tasks:
+    - name: Configure environment (Azure)
+      script: ./bin/configure_azure_environment.sh
+      when:
+        - config_info.system_type == "azure"
+
     - name: package installation
       block:
         - name: install_pkgs
