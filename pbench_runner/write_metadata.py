@@ -34,6 +34,9 @@ if __name__ == '__main__':
         with open(ARGS.file, 'r') as f:
             metadata = json.load(f)
     else:
+        dirname = os.path.dirname(ARGS.file)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
         metadata = {}
 
     # Update the metadata entries
