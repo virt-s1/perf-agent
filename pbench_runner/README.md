@@ -20,6 +20,15 @@ mkdir -p $log_path
 # Change to log directory
 cd $log_path
 
-......
+# Write down metadata to a json file
+write_metadata.py --file $log_path/testrun_metadata.json \
+    --keypair testrun.platform=ESXi \
+    --keypair testrun.type=fio \
+    --keypair os.compose=RHEL-8.3.0-2020111009.2 \
+    --keypair disk.backend=NVMe \
+    --keypair disk.driver=scsi \
+    --keypair disk.format=raw \
+    --keypair host.cpu=32 \
+    --keypair host.memory=16G
 
 ```
