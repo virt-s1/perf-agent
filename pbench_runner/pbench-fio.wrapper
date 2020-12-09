@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Description:
+#   This is a wrapper of pbench-fio, it helps users to iterate
+#   the "iodepth" and "numjobs" arguments.
+
+args=""
+iodepth_list="1"
+numjobs_list="1"
+
+for arg in $@; do
+    if [[ "$arg" =~ ^--iodepth= ]]; then
+        # take over iodepth
+        iodepth_list=$(echo $arg | cut -d= -f2 | tr ',' ' ')
+        continue
+    fi
+
+    if [[ "$arg" =~ ^--numjobs= ]]; then
+        # take over numjobs
+        numjobs_list=$(echo $arg | cut -d= -f2 | tr ',' ' ')
+        continue
+    fi
+
+    # append non-processed args
+    [ ! -z "$args" ] && args="$args $arg" || args="$arg"
+done
+
+#echo $args
+#echo $iodepth_list
+#echo $numjobs_list
+
+# iterate iodepth and numjobs
+for iodepth in $iodepth_list; do
+    for numjobs in $numjobs_list; do
+        pbench-fio $args --iodepth=$iodepth --numjobs=$numjobs
+    done
+done
