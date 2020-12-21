@@ -41,7 +41,7 @@ Example:
 
 ```bash
 # Run pbench-fio for sequential access
-./pbench-fio.wrapper --config=$testrun_id \
+./pbench-fio.wrapper --config=${testrun_id#*_} \
     --job-file=./fio-default.job --samples=5 \
     --targets=/dev/sdx --job-mode=concurrent \
     --pre-iteration-script=./drop-cache.sh \
