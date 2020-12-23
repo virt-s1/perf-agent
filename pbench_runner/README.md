@@ -1,12 +1,17 @@
 # pbench-fio usage
 
-## 1. Get the TestRunID
+## 1. Create a TestRunID
 
 Example:
 
 ```bash
-testrun_id=$(./make_testrunid.py --type fio --platform ESXi \
---compose RHEL-8.3.0-2020111009.2 --customized-labels x86_bios_scsi_lite) || exit 1
+testrun_id=$(./make_testrunid.py \
+    --type fio \
+    --platform ESXi \
+    --compose RHEL-8.3.0-2020111009.2 \
+    --customized-labels x86_bios_scsi_lite)
+
+[ -z $testrun_id ] && exit 1
 ```
 
 ## 2. Create log path
@@ -14,7 +19,7 @@ testrun_id=$(./make_testrunid.py --type fio --platform ESXi \
 Example:
 
 ```bash
-log_path="/some-path-to-yours/$testrun_id"
+log_path="/nfs-mount-point-or-your-own-path/$testrun_id"
 mkdir -p $log_path || exit 1
 ```
 
@@ -67,23 +72,26 @@ Note: Please follow below keypairs to prepare your metadata.
 Example:
 
 ```bash
+# Check target volume
+[ -b /dev/sdx ] || exit 1
+
 # Run pbench-fio for sequential access
 ./pbench-fio.wrapper --config=${testrun_id#*_} \
     --job-file=./fio-default.job --samples=5 \
     --targets=/dev/sdx --job-mode=concurrent \
     --pre-iteration-script=./drop-cache.sh \
-    --test-types=write \
-    --block-sizes=4,1024 \
-    --iodepth=1,64 --numjobs=16
+    --test-types=read,write,rw \
+    --block-sizes=4,64,1024 \
+    --iodepth=1,8,64 --numjobs=1,16
 
 # Run pbench-fio for random access
-./pbench-fio.wrapper --config=$testrun_id \
+./pbench-fio.wrapper --config=${testrun_id#*_} \
     --job-file=./fio-default.job  --samples=5 \
     --targets=/dev/sdx --job-mode=concurrent \
     --pre-iteration-script=./drop-cache.sh \
-    --test-types=randrw \
-    --block-sizes=4,1024 \
-    --iodepth=1,64 --numjobs=1
+    --test-types=randread,randwrite,randrw \
+    --block-sizes=4,64,1024 \
+    --iodepth=1,8,64 --numjobs=1,16
 ```
 
 ## 5. Collect test results to the log path
@@ -92,5 +100,5 @@ Example:
 
 ```bash
 # Collect test results to the log path
-mv /var/lib/pbench-agent/$testrun_id* $log_path
+mv /var/lib/pbench-agent/${testrun_id}* $log_path
 ```
