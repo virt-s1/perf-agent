@@ -6,7 +6,7 @@ Example:
 
 ```bash
 testrun_id=$(./make_testrunid.py --type fio --platform ESXi \
---compose RHEL-8.3.0-2020111009.2 --customized-labels lite_scsi) || exit 1
+--compose RHEL-8.3.0-2020111009.2 --customized-labels x86_bios_scsi_lite) || exit 1
 ```
 
 ## 2. Create log path
@@ -24,15 +24,42 @@ Example:
 
 ```bash
 ./write_metadata.py --file $log_path/testrun_metadata.json \
-    --keypair testrun.platform=ESXi \
+    --keypair testrun.id=$testrun_id \
     --keypair testrun.type=fio \
-    --keypair os.compose=RHEL-8.3.0-2020111009.2 \
-    --keypair disk.backend=NVMe \
-    --keypair disk.driver=scsi \
-    --keypair disk.format=raw \
-    --keypair vm.cpu=64 \
-    --keypair vm.memory=16G \
-    --keypair hardware.flavor=esx.g2.4xlarge
+    --keypair testrun.platform=ESXi \
+    --keypair ......
+```
+
+Note: Please follow below keypairs to prepare your metadata.
+
+```json
+{
+   "testrun.id": "fio_ESXi_RHEL-8.4.0-20201209.n.0_x86_64-BIOS-A_lite_scsi_D201220T212213",
+   "testrun.type": "fio",
+   "testrun.platform": "ESXi",
+   "testrun.date": "2020-12-20",
+   "testrun.comments": "",
+   "hardware.disk.capacity": "80G",
+   "hardware.disk.backend": "NVMe",
+   "hardware.disk.driver": "SCSI",
+   "hardware.disk.format": "raw",
+   "hardware.net.capacity": "40GiB",
+   "hardware.net.driver": "",
+   "hardware.net.speed": "",
+   "hardware.net.duplex": "",
+   "os.branch": "RHEL-8.4",
+   "os.compose": "RHEL-8.4.0-20201209.n.0",
+   "os.kernel": "4.18.0-259.el8.x86_64",
+   "tool.fio.version": "fio-3.19-3.el8.x86_64",
+   "tool.uperf.version": "uperf",
+   "guest.cpu": "16",
+   "guest.flavor": "esx.g2.4xlarge",
+   "guest.memory": "64GB",
+   "cloud.region": "us-west-1",
+   "hypervisor.cpu": "128",
+   "hypervisor.cpu_model": "AMD EPYC 7251",
+   "hypervisor.version": "VMware ESX 7.0.1 build-16850804"
+}
 ```
 
 ## 4. Run the pbench-fio test
