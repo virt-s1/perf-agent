@@ -28,7 +28,7 @@ mkdir -p $log_path || exit 1
 Example:
 
 ```bash
-./write_metadata.py --file $log_path/testrun_metadata.json \
+./write_metadata.py --file $log_path/metadata.json \
     --keypair testrun.id=$testrun_id \
     --keypair testrun.type=fio \
     --keypair testrun.platform=ESXi \
