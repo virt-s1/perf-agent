@@ -29,9 +29,9 @@ Example:
 
 ```bash
 ./write_metadata.py --file $log_path/metadata.json \
-    --keypair testrun_id=$testrun_id \
-    --keypair testrun_type=fio \
-    --keypair testrun_platform=ESXi \
+    --keypair testrun-id=$testrun_id \
+    --keypair testrun-type=fio \
+    --keypair testrun-platform=ESXi \
     --keypair ......
 ```
 
