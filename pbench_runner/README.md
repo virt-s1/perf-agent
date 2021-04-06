@@ -21,8 +21,8 @@ Notes:
 Example of a unified TestRunID:
 ```
 fio_ESXi_RHEL-8.4.0-20201209.n.0_x86_bios_scsi_standard_D201220T212213
---- ---- ----------------------- ------------------ --------------
-|   |    |                       |                  |______________ Timestammp
+--- ---- ----------------------- ---------------------- --------------
+|   |    |                       |                      |__________ Timestammp
 |   |    |                       |_________________________________ Customized labels
 |   |    |_________________________________________________________ Compose ID
 |   |______________________________________________________________ Platform: "ESXi", "AWS", etc
@@ -58,9 +58,9 @@ Notes:
 - This script can be run more than once, it performs add/update logic to the json file.
 - When preparing metadata, follow the example below to obtain the key pair name and format.
 - The key pair name and format can be changed in the future, so keep an eye on this.
-- If you need to add key pairs, please talk with the project owners to ensure consistency.
+- If you need to add key pairs, please contact the project owners to ensure consistency.
 
-```json
+```js
 {
    // The TestRun information
    "testrun-id": "fio_ESXi_RHEL-8.4.0-20201209.n.0_x86_bios_scsi_standard_D201220T212213",
@@ -129,7 +129,7 @@ Notes:
   - To use any customized dimension other than the listed, put the "customized" keyword in TestRunID.
 
 | Dimension | Duration | test-types | block-sizes      | iodepth     | numjobs   | samples | runtime |
-| --------- | -------- | ---------- | ---------------- | ----------- | --------- | ------- | ------- |
+| :-------- | :------- | :--------- | :--------------- | :---------- | :-------- | :------ | :------ |
 | quick     | ~ 1.6h   | all_types  | 4,1024           | 1,64        | 1,16      | 3       | 10s     |
 | standard  | ~ 9h     | all_types  | 4,64,1024        | 1,8,64      | 1,16      | 5       | 30s     |
 | extended  | ~ 50h    | all_types  | 4,16,64,256,1024 | 1,4,8,32,64 | 1,8,16,32 | 5       | 30s     |
