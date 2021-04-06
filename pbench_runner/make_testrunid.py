@@ -21,7 +21,7 @@ ARG_PARSER.add_argument('--platform',
                         dest='platform',
                         action='store',
                         help='Which platform the tests are running on.',
-                        choices=['ESXi', 'Hyper-V', 'AWS', 'Azure'],
+                        choices=['ESXi', 'Hyper-V', 'AWS', 'Azure', 'KVM'],
                         default='UnknownPlatform',
                         required=True)
 ARG_PARSER.add_argument('--compose',
@@ -40,7 +40,8 @@ TestRunID, separated by underline (_) between multiple labels.',
 ARG_PARSER.add_argument('--timestamp',
                         dest='timestamp',
                         action='store',
-                        help='The timestamp in "D%%y%%m%%dT%%H%%M%%S" format.',
+                        help='The timestamp in "D%%y%%m%%dT%%H%%M%%S" format, \
+the current timestamp will be used if not speicified.',
                         default=None,
                         required=False)
 
