@@ -156,10 +156,10 @@ Command:
 
 ```bash
 # Load the results into database
-ssh root@perf-insight.lab.eng.pek2.redhat.com /opt/perf-insight/utils/process_testrun.sh -t ${testrun_id} -s -d -P
+ssh virtqe@perf-insight.lab.eng.pek2.redhat.com sudo /opt/perf-insight/utils/process_testrun.sh -t ${testrun_id} -s -d -P
 
 # Generate benchmark report
-ssh root@perf-insight.lab.eng.pek2.redhat.com /opt/perf-insight/utils/compare_testruns.sh -t ${testrun_id} -b <base_testrun_id>
+ssh virtqe@perf-insight.lab.eng.pek2.redhat.com sudo /opt/perf-insight/utils/compare_testruns.sh -t ${testrun_id} -b <base_testrun_id>
 ```
 
 Notes:
