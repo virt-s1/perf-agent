@@ -148,3 +148,20 @@ mv /var/lib/pbench-agent/${testrun_id}* $log_path
 
 Notes:
 - Currently, we deliver logs to the perf-insight server via NFS.
+
+
+## 6. Load the results into database and generate benchmark report
+
+Command:
+
+```bash
+# Load the results into database
+ssh virtqe@perf-insight.lab.eng.pek2.redhat.com sudo /opt/perf-insight/utils/process_testrun.sh -t ${testrun_id} -s -d -P
+
+# Generate benchmark report
+ssh virtqe@perf-insight.lab.eng.pek2.redhat.com sudo /opt/perf-insight/utils/compare_testruns.sh -t ${testrun_id} -b <base_testrun_id>
+```
+
+Notes:
+- This is a temporary solution to perform these actions using `ssh`. Therefore, you will need to handle the authentication of ssh keypairs by yourself.
+- `compare_testruns.sh` will prompt the "URL of the report" in the last line. So that you can get the URL to send with your email.
