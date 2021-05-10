@@ -21,7 +21,7 @@ ARG_PARSER.add_argument('--platform',
                         dest='platform',
                         action='store',
                         help='Which platform the tests are running on.',
-                        choices=['ESXi', 'Hyper-V', 'AWS', 'Azure', 'KVM'],
+                        choices=['ESXi', 'HyperV', 'AWS', 'Azure', 'KVM'],
                         default='UnknownPlatform',
                         required=True)
 ARG_PARSER.add_argument('--compose',
