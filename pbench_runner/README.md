@@ -145,34 +145,6 @@ Command:
 
 More:
 ./pbench-uperf-runner.py --help
-usage: pbench-uperf-runner.py [-h] --server_ip SERVER_IP --client_ip CLIENT_IP --config CONFIG [--test_suite_name TEST_SUITE_NAME] [--protocols PROTOCOLS] [--test_types TEST_TYPES] [--runtime RUNTIME] [--message_sizes MESSAGE_SIZES] [--instances INSTANCES] [--nr_samples NR_SAMPLES] [--max_failures MAX_FAILURES]
-                              [--maxstddevpct MAXSTDDEVPCT]
-
-Arguments of Pbench-uperf.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --server_ip SERVER_IP
-  --client_ip CLIENT_IP
-  --config CONFIG
-  --test_suite_name TEST_SUITE_NAME
-                        Test suite name.
-  --protocols PROTOCOLS, -p PROTOCOLS
-                        Network performance protocols supports.
-  --test_types TEST_TYPES, -t TEST_TYPES
-                        Network performance test types supports.
-  --runtime RUNTIME, -r RUNTIME
-                        Run time one case run.
-  --message_sizes MESSAGE_SIZES, -m MESSAGE_SIZES
-                        Message size used in test.
-  --instances INSTANCES, -i INSTANCES
-                        Counts of threads.
-  --nr_samples NR_SAMPLES, -ns NR_SAMPLES
-                        Counts of runs.
-  --max_failures MAX_FAILURES, -mf MAX_FAILURES
-                        Max failures times of one case.
-  --maxstddevpct MAXSTDDEVPCT, -ms MAXSTDDEVPCT
-                        Max stddevpct to check.
 ```
 
 Notes:
@@ -184,7 +156,7 @@ Notes:
   - It is strongly recommended to put the dimension keywords in TestRunID.
   - To use any customized dimension other than the listed, put the "customized" keyword in TestRunID.
 
-| Dimension | Duration | test-types | message_szie     | protocols   | instanc   | samples | runtime |
+| Dimension | Duration | test_types | message_sizes    | protocols   | instances | samples | runtime |
 | :-------- | :------- | :--------- | :--------------- | :---------- | :-------- | :------ | :------ |
 | quick     | ~ 1h     | all_types  | 1                | tcp,udp     | 1         | 3       | 20s     |
 | standard  | ~ 6h     | all_types  | 1,64             | tcp,udp     | 1,8       | 5       | 30s     |

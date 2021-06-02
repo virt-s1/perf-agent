@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser(description = "Arguments of Pbench-uperf.")
 parser.add_argument("--server_ip", required=True,   help = "Server IP of pbench-uperf.")
 parser.add_argument("--client_ip", required=True,   help = "Client IP of pbench-uperf.")
 parser.add_argument("--config", required=True,      help = "Unique ID for whole test.")
-parser.add_argument("--test_suite_name",            help = "Test suite name.")
+parser.add_argument("--test_suite_name", choices=['quick', 'quick', 'extended'], help = "Test suite name.")
 parser.add_argument("--protocols",      "-p",       help = "Network performance protocols supports.")
 parser.add_argument("--test_types",     "-t",       help = "Network performance test types supports.")
 parser.add_argument("--runtime",        "-r",       help = "Run time one case run.")
@@ -116,25 +116,23 @@ if __name__ == '__main__':
         # Get users arguments from commands when test_suite_name is null.
         print("INFO: Run users parameters in command line.")
         protocols = args.protocols
-        print("protocols: ", protocols)
         test_types = args.test_types
-        print("test_types: ", test_types)
         instances = args.instances
-        print("instances: ", instances)
         runtime = args.runtime
-        print("runtime: ", runtime)
         message_sizes = args.message_sizes
-        print("message_sizes: ", message_sizes)
         nr_samples = args.nr_samples
-        print("nr_samples: ", nr_samples)
         max_failures = args.max_failures
-        print("max_failures: ", max_failures)
         maxstddevpct = args.maxstddevpct
-        print("maxstddevpct: ", maxstddevpct)
-
-        run(server_ip, client_ip, config, protocols, test_types, runtime, message_sizes, instances, nr_samples, max_failures, maxstddevpct)
     else:
         print("INFO: Run test suite.")
         protocols, test_types, runtime, message_sizes, instances, nr_samples, max_failures, maxstddevpct = test_suites(test_suite_name)
 
-        run(server_ip, client_ip, config, protocols, test_types, runtime, message_sizes, instances, nr_samples, max_failures, maxstddevpct)
+    print("protocols: ", protocols)
+    print("test_types: ", test_types)
+    print("instances: ", instances)
+    print("runtime: ", runtime)
+    print("message_sizes: ", message_sizes)
+    print("nr_samples: ", nr_samples)
+    print("max_failures: ", max_failures)
+    print("maxstddevpct: ", maxstddevpct)
+    run(server_ip, client_ip, config, protocols, test_types, runtime, message_sizes, instances, nr_samples, max_failures, maxstddevpct)
