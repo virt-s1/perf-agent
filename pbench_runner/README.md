@@ -34,6 +34,7 @@ fio_ESXi_RHEL-8.4.0-20201209.n.0_x86_bios_scsi_standard_D201220T212213
 Command:
 
 ```bash
+mkdir /nfs-mount
 mount -t nfs perf-insight.lab.eng.pek2.redhat.com:/nfs /nfs-mount
 log_path="/nfs-mount/perf-insight/testruns/$testrun_id"
 mkdir -p $log_path
@@ -136,7 +137,31 @@ Notes:
 
 ### 4.2 pbench-uperf
 
-TBD
+Command:
+
+```bash
+# Run pbench-uperf-runner tests (quick)
+./pbench-uperf-runner.py --server_ip SERVER_IP --client_ip CLIENT_IP --config ${testrun_id#*_} --test_suite_name quick
+
+More:
+./pbench-uperf-runner.py --help
+```
+
+Notes:
+- `pbench-uperf-runner` allows users to use above 0 or mulit options.
+- `${testrun_id#*_}` is the remaining part without TestType, so that pbench generates test logs into `/var/lib/pbench-agent/TestRunID_*` folders.
+- This script can be run multiple times to complete your testing.
+- The different test dimension meet difference test requirements, the details can be found in the table below.
+  - "all_types" stands for "stream,maerts,bidirec,rr".
+  - It is strongly recommended to put the dimension keywords in TestRunID.
+  - To use any customized dimension other than the listed, put the "customized" keyword in TestRunID.
+
+| Dimension | Duration | test_types | message_sizes    | protocols   | instances | samples | runtime |
+| :-------- | :------- | :--------- | :--------------- | :---------- | :-------- | :------ | :------ |
+| quick     | ~ 1h     | all_types  | 1                | tcp,udp     | 1         | 3       | 20s     |
+| standard  | ~ 6h     | all_types  | 1,64             | tcp,udp     | 1,8       | 5       | 30s     |
+| extended  | ~ 40h    | all_types  | 1,64,1024,16384  | tcp,udp     | 1,8,64    | 5       | 60s     |
+
 
 ## 5. Deliver TestRun results
 
