@@ -34,6 +34,7 @@ fio_ESXi_RHEL-8.4.0-20201209.n.0_x86_bios_scsi_standard_D201220T212213
 Command:
 
 ```bash
+mkdir /nfs-mount
 mount -t nfs perf-insight.lab.eng.pek2.redhat.com:/nfs /nfs-mount
 log_path="/nfs-mount/perf-insight/testruns/$testrun_id"
 mkdir -p $log_path
@@ -136,7 +137,59 @@ Notes:
 
 ### 4.2 pbench-uperf
 
-TBD
+Command:
+
+```bash
+# Run pbench-uperf-runner tests (quick)
+./pbench-uperf-runner.py --server_ip SERVER_IP --client_ip CLIENT_IP --config ${testrun_id#*_} --test_suite_name quick
+
+More:
+./pbench-uperf-runner.py --help
+usage: pbench-uperf-runner.py [-h] --server_ip SERVER_IP --client_ip CLIENT_IP --config CONFIG [--test_suite_name TEST_SUITE_NAME] [--protocols PROTOCOLS] [--test_types TEST_TYPES] [--runtime RUNTIME] [--message_sizes MESSAGE_SIZES] [--instances INSTANCES] [--nr_samples NR_SAMPLES] [--max_failures MAX_FAILURES]
+                              [--maxstddevpct MAXSTDDEVPCT]
+
+Arguments of Pbench-uperf.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --server_ip SERVER_IP
+  --client_ip CLIENT_IP
+  --config CONFIG
+  --test_suite_name TEST_SUITE_NAME
+                        Test suite name.
+  --protocols PROTOCOLS, -p PROTOCOLS
+                        Network performance protocols supports.
+  --test_types TEST_TYPES, -t TEST_TYPES
+                        Network performance test types supports.
+  --runtime RUNTIME, -r RUNTIME
+                        Run time one case run.
+  --message_sizes MESSAGE_SIZES, -m MESSAGE_SIZES
+                        Message size used in test.
+  --instances INSTANCES, -i INSTANCES
+                        Counts of threads.
+  --nr_samples NR_SAMPLES, -ns NR_SAMPLES
+                        Counts of runs.
+  --max_failures MAX_FAILURES, -mf MAX_FAILURES
+                        Max failures times of one case.
+  --maxstddevpct MAXSTDDEVPCT, -ms MAXSTDDEVPCT
+                        Max stddevpct to check.
+```
+
+Notes:
+- `pbench-uperf-runner` allows users to use above 0 or mulit options.
+- `${testrun_id#*_}` is the remaining part without TestType, so that pbench generates test logs into `/var/lib/pbench-agent/TestRunID_*` folders.
+- This script can be run multiple times to complete your testing.
+- The different test dimension meet difference test requirements, the details can be found in the table below.
+  - "all_types" stands for "stream,maerts,bidirec,rr".
+  - It is strongly recommended to put the dimension keywords in TestRunID.
+  - To use any customized dimension other than the listed, put the "customized" keyword in TestRunID.
+
+| Dimension | Duration | test-types | message_szie     | protocols   | instanc   | samples | runtime |
+| :-------- | :------- | :--------- | :--------------- | :---------- | :-------- | :------ | :------ |
+| quick     | ~ 1h     | all_types  | 1                | tcp,udp     | 1         | 3       | 20s     |
+| standard  | ~ 6h     | all_types  | 1,64             | tcp,udp     | 1,8       | 5       | 30s     |
+| extended  | ~ 40h    | all_types  | 1,64,1024,16384  | tcp,udp     | 1,8,64    | 5       | 60s     |
+
 
 ## 5. Deliver TestRun results
 
