@@ -87,7 +87,7 @@
 - name: install pbench benchmarks
   package:
     name: "{{ item }}"
-    state: present
+    state: latest
   with_items:
     - uperf
     - fio
