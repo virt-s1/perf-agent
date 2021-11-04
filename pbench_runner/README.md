@@ -35,8 +35,8 @@ Command:
 
 ```bash
 mkdir /nfs-mount
-mount -t nfs perf-insight.lab.eng.pek2.redhat.com:/nfs /nfs-mount
-log_path="/nfs-mount/perf-insight/testruns/$testrun_id"
+mount -t nfs perf-insight.lab.eng.pek2.redhat.com:/nfs/perf-insight/.staging /nfs-mount
+log_path="/nfs-mount/$testrun_id"
 mkdir -p $log_path
 ```
 
@@ -122,7 +122,7 @@ Command:
 Notes:
 - `pbench-fio.wrapper` is a workaround to support iteration on `iodepth` and `numjobs` to meet QE requirments. It keeps the same usage of `pbench-fio`.
 - `${testrun_id#*_}` is the remaining part without TestType, so that pbench generates test logs into `/var/lib/pbench-agent/TestRunID_*` folders.
-- This script can be run multiple times to complete your testing.
+- This script **can be run multiple times** to complete your testing, all the results will be collected as the whole TestRun.
 - The different test dimension meet difference test requirements, the details can be found in the table below.
   - "all_types" stands for "read,write,rw,randread,randwrite,randrw".
   - `ramptime` is set to 5 seconds for the tests, so `runtime=10` can be valid.
@@ -169,6 +169,7 @@ Command:
 
 ```bash
 mv /var/lib/pbench-agent/${testrun_id}* $log_path
+chcon -R -u system_u -t svirt_sandbox_file_t $log_path
 ```
 
 Notes:
@@ -181,12 +182,19 @@ Command:
 
 ```bash
 # Load the results into database
-ssh virtqe@perf-insight.lab.eng.pek2.redhat.com sudo /opt/perf-insight/utils/process_testrun.sh -t ${testrun_id} -s -d -P
+ssh virtqe@perf-insight.lab.eng.pek2.redhat.com picli testrun-load --testrun-id ${testrun_id}
 
 # Generate benchmark report
-ssh virtqe@perf-insight.lab.eng.pek2.redhat.com sudo /opt/perf-insight/utils/compare_testruns.sh -t ${testrun_id} -b <base_testrun_id>
+base_id=<base_testrun_id>
+ssh virtqe@perf-insight.lab.eng.pek2.redhat.com picli benchmark-create --test-id ${testrun_id} --base-id ${base_id}
+
+# Get the Report URL
+report_url=$(picli --output-format json benchmark-inspect --report-id benchmark_${testrun_id}_over_${base_id} | jq -r '.url')
+[ ! -z "$report_url" ] # Let's send the report link with your email.
 ```
 
 Notes:
 - This is a temporary solution to perform these actions using `ssh`. Therefore, you will need to handle the authentication of ssh keypairs by yourself.
-- `compare_testruns.sh` will prompt the "URL of the report" in the last line. So that you can get the URL to send with your email.
+- Don't forget to install the `jq` package first (it has already been installed on perf-insight.lab.eng.pek2.redhat.com).
+- You can get the Report URL to send with your email.
+
