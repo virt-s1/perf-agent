@@ -109,19 +109,26 @@ Command:
 # Check target volume
 [ -b /dev/sdx ] || exit 1
 
-# Run pbench-fio tests (standard)
-./pbench-fio.wrapper --config=${testrun_id#*_} \
-    --job-file=./fio-default.job --samples=5 \
-    --targets=/dev/sdx --job-mode=concurrent \
-    --pre-iteration-script=./drop-cache.sh \
-    --test-types=read,write,rw,randread,randwrite,randrw \
-    --block-sizes=4,64,1024 --runtime=30 \
-    --iodepth=1,8,64 --numjobs=1,16
+# Run pbench-fio tests (standard) (deprecated)
+# ./pbench-fio.wrapper --config=${testrun_id#*_} \
+#     --job-file=./fio-default.job --samples=5 \
+#     --targets=/dev/sdx --job-mode=concurrent \
+#     --pre-iteration-script=./drop-cache.sh \
+#     --test-types=read,write,rw,randread,randwrite,randrw \
+#     --block-sizes=4,64,1024 --runtime=30 \
+#     --iodepth=1,8,64 --numjobs=1,16
+
+# Run pbench-fio test (standard)
+./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode standard
+
+# Or, run a customized test (TBD)
+# ./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode customized \
+#      --test-types randrw --block-sizes 4 --iodepth 1,16 --numjobs 1 --samples 3 --runtime 10
 ```
 
 Notes:
-- `pbench-fio.wrapper` is a workaround to support iteration on `iodepth` and `numjobs` to meet QE requirments. It keeps the same usage of `pbench-fio`.
-- `${testrun_id#*_}` is the remaining part without TestType, so that pbench generates test logs into `/var/lib/pbench-agent/TestRunID_*` folders.
+- (deprecated) `pbench-fio.wrapper` is a workaround to support iteration on `iodepth` and `numjobs` to meet QE requirments. It keeps the same usage of `pbench-fio`.
+- (deprecated) `${testrun_id#*_}` is the remaining part without TestType, so that pbench generates test logs into `/var/lib/pbench-agent/TestRunID_*` folders.
 - This script **can be run multiple times** to complete your testing, all the results will be collected as the whole TestRun.
 - The different test dimension meet difference test requirements, the details can be found in the table below.
   - "all_types" stands for "read,write,rw,randread,randwrite,randrw".
@@ -156,11 +163,11 @@ Notes:
   - It is strongly recommended to put the dimension keywords in TestRunID.
   - To use any customized dimension other than the listed, put the "customized" keyword in TestRunID.
 
-| Dimension | Duration | test_types | message_sizes    | protocols   | instances | samples | runtime |
-| :-------- | :------- | :--------- | :--------------- | :---------- | :-------- | :------ | :------ |
-| quick     | ~ 1h     | all_types  | 1                | tcp,udp     | 1         | 3       | 20s     |
-| standard  | ~ 6h     | all_types  | 1,64             | tcp,udp     | 1,8       | 5       | 30s     |
-| extended  | ~ 40h    | all_types  | 1,64,1024,16384  | tcp,udp     | 1,8,64    | 5       | 60s     |
+| Dimension | Duration | test_types | message_sizes   | protocols | instances | samples | runtime |
+| :-------- | :------- | :--------- | :-------------- | :-------- | :-------- | :------ | :------ |
+| quick     | ~ 1h     | all_types  | 1               | tcp,udp   | 1         | 3       | 20s     |
+| standard  | ~ 6h     | all_types  | 1,64            | tcp,udp   | 1,8       | 5       | 30s     |
+| extended  | ~ 40h    | all_types  | 1,64,1024,16384 | tcp,udp   | 1,8,64    | 5       | 60s     |
 
 
 ## 5. Deliver TestRun results

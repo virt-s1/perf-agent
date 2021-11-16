@@ -2,11 +2,18 @@
 
 
 # File Name: pbench-uperf-runner.py
+#
 # Description:
 #	A wrapper of pbench-uperf, supports 0 or multi test parameters.
+#
+# Owner:
+#   Bo Yang <boyang@redhat.com>
+#
 # Reversions:
-#   v0.0.1 - 03/01/2021 - Built the script.
-#   v0.0.2 - 04/02/2021 - Enhanced arguments output.
+#   v0.0.1 - 03/01/2021 - Bo Yang - Built the script.
+#   v0.0.2 - 04/02/2021 - Bo Yang - Enhanced arguments output.
+#   v0.0.3 - 11/16/2021 - Charles Shih - PEP 8 formating.
+#   v0.0.4 - 11/16/2021 - Charles Shih - Update the help message.
 
 
 import os
@@ -14,20 +21,32 @@ import argparse
 import subprocess
 
 
-parser = argparse.ArgumentParser(description = "Arguments of Pbench-uperf.")
+parser = argparse.ArgumentParser(description="Arguments of Pbench-uperf.")
 
-parser.add_argument("--server_ip", required=True,   help = "Server IP of pbench-uperf.")
-parser.add_argument("--client_ip", required=True,   help = "Client IP of pbench-uperf.")
-parser.add_argument("--config", required=True,      help = "Unique ID for whole test.")
-parser.add_argument("--test_suite_name", choices=['quick', 'standard', 'extended'], help = "Test suite name.")
-parser.add_argument("--protocols",      "-p",       help = "Network performance protocols supports.")
-parser.add_argument("--test_types",     "-t",       help = "Network performance test types supports.")
-parser.add_argument("--runtime",        "-r",       help = "Run time one case run.")
-parser.add_argument("--message_sizes",  "-m",       help = "Message size used in test.")
-parser.add_argument("--instances",      "-i",       help = "Counts of threads.")
-parser.add_argument("--nr_samples",     "-ns",      help = "Counts of runs.")
-parser.add_argument("--max_failures",   "-mf",      help = "Max failures times of one case.")
-parser.add_argument("--maxstddevpct",   "-ms",      help = "Max stddevpct to check.")
+parser.add_argument("--server_ip", required=True,
+                    help="Server IP of pbench-uperf.")
+parser.add_argument("--client_ip", required=True,
+                    help="Client IP of pbench-uperf.")
+parser.add_argument("--config", required=True,
+                    help="Unique ID for whole test.")
+parser.add_argument("--test_suite_name",
+                    choices=['quick', 'standard', 'extended'],
+                    help="Run as the pre-defined testsuite. "
+                    "(By using this, below args will be overwriten)")
+parser.add_argument("--protocols", "-p",
+                    help="Network performance protocols supports.")
+parser.add_argument("--test_types", "-t",
+                    help="Network performance test types supports.")
+parser.add_argument("--runtime", "-r",
+                    help="Run time one case run.")
+parser.add_argument("--message_sizes", "-m",
+                    help="Message size used in test.")
+parser.add_argument("--instances", "-i", help="Counts of threads.")
+parser.add_argument("--nr_samples", "-ns", help="Counts of runs.")
+parser.add_argument("--max_failures", "-mf",
+                    help="Max failures times of one case.")
+parser.add_argument("--maxstddevpct", "-ms",
+                    help="Max stddevpct to check.")
 
 args = parser.parse_args()
 
@@ -69,11 +88,13 @@ def test_suites(test_suite_name):
         print("ERROR: Incorrect test suite name.")
         return False
 
-    return protocols, test_types, runtime, message_sizes, instances, nr_samples, max_failures, maxstddevpct
+    return (protocols, test_types, runtime, message_sizes, instances,
+            nr_samples, max_failures, maxstddevpct)
 
 
 # Function to execute pbench-uperf command.
-def run(server_ip, client_ip, config, protocols, test_types, runtime, message_sizes, instances, nr_samples, max_failures, maxstddevpct):
+def run(server_ip, client_ip, config, protocols, test_types, runtime,
+        message_sizes, instances, nr_samples, max_failures, maxstddevpct):
 
     command = "pbench-uperf "
     command += "-S {} ".format(server_ip)
@@ -99,7 +120,8 @@ def run(server_ip, client_ip, config, protocols, test_types, runtime, message_si
         command += "--max-stddev={} ".format(maxstddevpct)
     print("DEBUG: command:", command)
 
-    ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8")
+    ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE, encoding="utf-8")
     # Store ret.stdout to a file.
 
 
@@ -109,7 +131,7 @@ if __name__ == '__main__':
     server_ip = args.server_ip
     client_ip = args.client_ip
     config = args.config
-    
+
     # Ignore others arguments from command line, run test_suite_name test matrix.
     test_suite_name = args.test_suite_name
     if not test_suite_name:
@@ -125,7 +147,8 @@ if __name__ == '__main__':
         maxstddevpct = args.maxstddevpct
     else:
         print("INFO: Run test suite.")
-        protocols, test_types, runtime, message_sizes, instances, nr_samples, max_failures, maxstddevpct = test_suites(test_suite_name)
+        (protocols, test_types, runtime, message_sizes, instances, nr_samples,
+         max_failures, maxstddevpct) = test_suites(test_suite_name)
 
     print("protocols: ", protocols)
     print("test_types: ", test_types)
@@ -135,4 +158,5 @@ if __name__ == '__main__':
     print("nr_samples: ", nr_samples)
     print("max_failures: ", max_failures)
     print("maxstddevpct: ", maxstddevpct)
-    run(server_ip, client_ip, config, protocols, test_types, runtime, message_sizes, instances, nr_samples, max_failures, maxstddevpct)
+    run(server_ip, client_ip, config, protocols, test_types, runtime,
+        message_sizes, instances, nr_samples, max_failures, maxstddevpct)
