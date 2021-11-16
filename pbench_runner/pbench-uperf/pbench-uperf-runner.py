@@ -13,6 +13,7 @@
 #   v0.0.1 - 03/01/2021 - Bo Yang - Built the script.
 #   v0.0.2 - 04/02/2021 - Bo Yang - Enhanced arguments output.
 #   v0.0.3 - 11/16/2021 - Charles Shih - PEP 8 formating.
+#   v0.0.4 - 11/16/2021 - Charles Shih - Update the help message.
 
 
 import os
@@ -30,7 +31,8 @@ parser.add_argument("--config", required=True,
                     help="Unique ID for whole test.")
 parser.add_argument("--test_suite_name",
                     choices=['quick', 'standard', 'extended'],
-                    help="Test suite name.")
+                    help="Run as the pre-defined testsuite. "
+                    "(By using this, below args will be overwriten)")
 parser.add_argument("--protocols", "-p",
                     help="Network performance protocols supports.")
 parser.add_argument("--test_types", "-t",
