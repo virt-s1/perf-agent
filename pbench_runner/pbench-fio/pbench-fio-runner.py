@@ -139,8 +139,9 @@ if __name__ == '__main__':
                       '"iodepth", "numjobs" arguments in "reproducing" mode.')
             exit(1)
 
-    # Read profile
-    LOG.info('Loading profiles...')
+    # Gather pbench-fio arguments
+    LOG.info('Gathering pbench-fio arguments...')
+
     try:
         with open(ARGS.profile, 'r') as f:
             profile = toml.load(f)
@@ -148,25 +149,34 @@ if __name__ == '__main__':
         LOG.error('Failed to load the profile: {}'.format(err))
         exit(1)
 
-    # Update pbench-fio arguments
     arguments = profile.get('DEFAULT', {})
     arguments.update(profile.get(ARGS.mode, {}))
 
     arguments.update({'config': testrun_id.removeprefix('fio_')})
     arguments.update({'targets': ARGS.targets})
 
+    if ARGS.test_types:
+        arguments.update({'test-types': ARGS.test_types})
+    if ARGS.block_sizes:
+        arguments.update({'block-sizes': ARGS.block_sizes})
+    if ARGS.iodepth:
+        arguments.update({'iodepth': ARGS.iodepth})
+    if ARGS.numjobs:
+        arguments.update({'numjobs': ARGS.numjobs})
+    if ARGS.samples:
+        arguments.update({'samples': ARGS.samples})
+    if ARGS.runtime:
+        arguments.update({'runtime': ARGS.runtime})
+
     LOG.debug('pbench-fio arguments:\n{}'.format(
         json.dumps(arguments, indent=3)))
 
+    # Expend to the pbench-fio runs
     pbench_fio_runs = []
     if ARGS.mode == 'reproducing':
         # TODO: generate reproducing runs.
         pass
     else:
-        if ARGS.mode == 'customized':
-            # TODO: overwrite for customized runs.
-            pass
-
         # Expend the iodepth and numjobs iterations
         LOG.info('Expending the iodepth and numjobs iterations...')
         iodepth_list = arguments.pop('iodepth', '1')
