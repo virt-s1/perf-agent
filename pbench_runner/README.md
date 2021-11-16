@@ -118,12 +118,14 @@ Command:
 #     --block-sizes=4,64,1024 --runtime=30 \
 #     --iodepth=1,8,64 --numjobs=1,16
 
-# Run pbench-fio test (standard)
-./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode standard
+# Run pre-defined pbench-fio tests in a quick/standard/extended mode
+./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode <quick|standard|extended>
 
-# Or, run a customized test (TBD)
-# ./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode customized \
-#      --test-types randrw --block-sizes 4 --iodepth 1,16 --numjobs 1 --samples 3 --runtime 10
+# Or, run a series of custom tests
+./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode customized \
+     --test-types rw --block-sizes 1024 --iodepth 1,64 --numjobs 1,16 --samples 3 --runtime 10
+./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode customized \
+     --test-types randrw --block-sizes 4 --iodepth 1,64 --numjobs 1,16 --samples 3 --runtime 10
 ```
 
 Notes:
