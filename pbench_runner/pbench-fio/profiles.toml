@@ -1,0 +1,46 @@
+[DEFAULT]
+# config        # will be specified by user
+# targets       # will be specified by user
+job-file="./fio-default.job"
+pre-iteration-script="./drop-cache.sh"
+job-mode="concurrent"
+
+[quick]
+test-types="read,write,rw,randread,randwrite,randrw"
+block-sizes="4,1024"
+iodepth="1,64"
+numjobs="1,16"
+samples="3"
+runtime="10"
+
+[standard]
+test-types="read,write,rw,randread,randwrite,randrw"
+block-sizes="4,64,1024"
+iodepth="1,8,64"
+numjobs="1,16"
+samples="5"
+runtime="30"
+
+[extended]
+test-types="read,write,rw,randread,randwrite,randrw"
+block-sizes="4,16,64,256,1024"
+iodepth="1,4,8,32,64"
+numjobs="1,8,16,32"
+samples="5"
+runtime="30"
+
+[customized]
+# This section provides default parameters for the "customized" mode.
+# And the following parameters can be overwritten by users.
+test-types="read,write,rw,randread,randwrite,randrw"
+block-sizes="4,64,1024"
+iodepth="1,8,64"
+numjobs="1,16"
+samples="5"
+runtime="30"
+
+[reproducing]
+# This section provides default parameters for the "reproducing" mode.
+# And the following parameters can be overwritten by users.
+samples="5"
+runtime="30"
