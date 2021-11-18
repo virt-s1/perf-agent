@@ -201,16 +201,27 @@ curl https://raw.githubusercontent.com/virt-s1/perf-insight/main/cli_tool/.picli
 chmod a+x /bin/picli
 sed -i 's/localhost:5000/perf-insight.lab.eng.pek2.redhat.com:5000/' ~/.picli.toml
 
+pip3 install click tabulate --user
+
 # Load the results into database
 picli testrun-load --testrun-id ${testrun_id}
 
 # Generate benchmark report
 base_id=<base_testrun_id>
 picli benchmark-create --test-id ${testrun_id} --base-id ${base_id}
+report_id=benchmark_${testrun_id}_over_${base_id}
 
-# Get the Report URL
-report_url=$(picli --output-format json benchmark-inspect --report-id benchmark_${testrun_id}_over_${base_id} | jq -r '.url')
-[ ! -z "$report_url" ] # Let's send the report link with your email.
+# Get more useful information about the report
+if ! (jq --version); then sudo dnf install -y jq; fi
+
+# Report URL (http://...)
+picli --output-format json benchmark-inspect --report-id $report_id | jq -r '.url'
+
+# Benchmark Conclusion (PASS/FAIL)
+picli --output-format json benchmark-inspect --get-statistics true --report-id $report_id | jq -r '.statistics.benchmark_result'
+
+# The number of DR cases (0 or 1,2,3,...)
+picli --output-format json benchmark-inspect --get-statistics true --report-id $report_id | jq -r '.statistics.case_num_dramatic_regression'
 ```
 
 Notes:
