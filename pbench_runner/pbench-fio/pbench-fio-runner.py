@@ -160,7 +160,7 @@ if __name__ == '__main__':
     arguments = profile.get('DEFAULT', {})
     arguments.update(profile.get(ARGS.mode, {}))
 
-    arguments.update({'config': testrun_id.removeprefix('fio_')})
+    arguments.update({'config': testrun_id[4:]})
     arguments.update({'targets': ARGS.targets})
 
     if ARGS.test_types:
