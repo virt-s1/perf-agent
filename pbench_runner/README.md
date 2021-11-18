@@ -126,6 +126,10 @@ Command:
      --test-types rw --block-sizes 1024 --iodepth 1,64 --numjobs 1,16 --samples 3 --runtime 10
 ./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode customized \
      --test-types randrw --block-sizes 4 --iodepth 1,64 --numjobs 1,16 --samples 3 --runtime 10
+
+# Or, reproduce the failure cases from a benchmark report
+./pick_up_failure_cases.py --report-id <Benchmark Report ID>
+./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode backlog
 ```
 
 Notes:
