@@ -39,8 +39,8 @@ numjobs="1,16"
 samples="5"
 runtime="30"
 
-[reproducing]
-# This section provides default parameters for the "reproducing" mode.
+[backlog]
+# This section provides default parameters for the "backlog" mode.
 # And the following parameters can be overwritten by users.
 samples="5"
 runtime="30"
