@@ -24,82 +24,91 @@ logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
 ARG_PARSER = argparse.ArgumentParser(
     description="The runner for scheduling pbench-fio runs.")
 
-ARG_PARSER.add_argument('--testrun-id',
-                        dest='testrun_id',
-                        action='store',
-                        help='The TestRun ID associated with this run.',
-                        default=None,
-                        required=True)
-ARG_PARSER.add_argument('--targets',
-                        dest='targets',
-                        action='store',
-                        help='The pbench-fio targets argument.',
-                        default=None,
-                        required=True)
-ARG_PARSER.add_argument('--mode',
-                        dest='mode',
-                        action='store',
-                        help='The pre-defined testing mode.',
-                        choices=['quick', 'standard', 'extended',
-                                 'customized', 'reproducing'],
-                        required=True)
-ARG_PARSER.add_argument('--profile',
-                        dest='profile',
-                        action='store',
-                        help='The profile of the pre-defined modes.',
-                        default='./profiles.toml',
-                        required=False)
-ARG_PARSER.add_argument('--report-id',
-                        dest='report_id',
-                        action='store',
-                        help='The benchmark report ID to be analized. '
-                        '(a picli request will be triggered to query '
-                        'information)',
-                        default=None,
-                        required=False)
-ARG_PARSER.add_argument('--test-types',
-                        dest='test_types',
-                        action='store',
-                        help='The pbench-fio test-types argument.',
-                        default=None,
-                        required=False)
-ARG_PARSER.add_argument('--block-sizes',
-                        dest='block_sizes',
-                        action='store',
-                        help='The pbench-fio block-sizes argument.',
-                        default=None,
-                        required=False)
-ARG_PARSER.add_argument('--iodepth',
-                        dest='iodepth',
-                        action='store',
-                        help='The pbench-fio iodepth argument.',
-                        default=None,
-                        required=False)
-ARG_PARSER.add_argument('--numjobs',
-                        dest='numjobs',
-                        action='store',
-                        help='The pbench-fio numjobs argument.',
-                        default=None,
-                        required=False)
-ARG_PARSER.add_argument('--samples',
-                        dest='samples',
-                        action='store',
-                        help='The pbench-fio samples argument.',
-                        default=None,
-                        required=False)
-ARG_PARSER.add_argument('--runtime',
-                        dest='runtime',
-                        action='store',
-                        help='The pbench-fio runtime argument.',
-                        default=None,
-                        required=False)
-ARG_PARSER.add_argument('--dry-run',
-                        dest='dry_run',
-                        action='store_true',
-                        help='Parse the arguments only without running '
-                        'any test cases.',
-                        default=None,
-                        required=False)
+ARG_PARSER.add_argument(
+    '--testrun-id',
+    dest='testrun_id',
+    action='store',
+    help='The TestRun ID associated with this run.',
+    default=None,
+    required=True)
+ARG_PARSER.add_argument(
+    '--targets',
+    dest='targets',
+    action='store',
+    help='The pbench-fio targets argument.',
+    default=None,
+    required=True)
+ARG_PARSER.add_argument(
+    '--mode',
+    dest='mode',
+    action='store',
+    help='The pre-defined testing mode.',
+    choices=['quick', 'standard', 'extended', 'customized', 'reproducing'],
+    required=True)
+ARG_PARSER.add_argument(
+    '--profile',
+    dest='profile',
+    action='store',
+    help='The profile of the pre-defined modes.',
+    default='./profiles.toml',
+    required=False)
+ARG_PARSER.add_argument(
+    '--report-id',
+    dest='report_id',
+    action='store',
+    help='The benchmark report ID to be analized. (a picli request will be \
+triggered to query information)',
+    default=None,
+    required=False)
+ARG_PARSER.add_argument(
+    '--test-types',
+    dest='test_types',
+    action='store',
+    help='The pbench-fio test-types argument.',
+    default=None,
+    required=False)
+ARG_PARSER.add_argument(
+    '--block-sizes',
+    dest='block_sizes',
+    action='store',
+    help='The pbench-fio block-sizes argument.',
+    default=None,
+    required=False)
+ARG_PARSER.add_argument(
+    '--iodepth',
+    dest='iodepth',
+    action='store',
+    help='The pbench-fio iodepth argument.',
+    default=None,
+    required=False)
+ARG_PARSER.add_argument(
+    '--numjobs',
+    dest='numjobs',
+    action='store',
+    help='The pbench-fio numjobs argument.',
+    default=None,
+    required=False)
+ARG_PARSER.add_argument(
+    '--samples',
+    dest='samples',
+    action='store',
+    help='The pbench-fio samples argument.',
+    default=None,
+    required=False)
+ARG_PARSER.add_argument(
+    '--runtime',
+    dest='runtime',
+    action='store',
+    help='The pbench-fio runtime argument.',
+    default=None,
+    required=False)
+ARG_PARSER.add_argument(
+    '--dry-run',
+    dest='dry_run',
+    action='store_true',
+    help='Parse the arguments only without running any test cases.',
+    default=None,
+    required=False)
 
 
 if __name__ == '__main__':
