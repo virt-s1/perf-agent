@@ -1,5 +1,8 @@
 # Usage
 
+This is about using pbench-fio and pbench-uperf on the test machine.  
+Since perf-insight supports users to store their test logs on perf-insight or pbench-server (recommended), this instruction will cover both usages. Choose the correct description based on your situation.
+
 ## 1. Generate a TestRunID
 
 Command:
@@ -29,27 +32,49 @@ fio_ESXi_RHEL-8.4.0-20201209.n.0_x86_bios_scsi_standard_D201220T212213
 |__________________________________________________________________ TestType: "fio", "uperf", etc
 ```
 
-## 2. Create log path
+## 2. Setup and configuration
+
+### 2.1 General preparation
+
+Command:
+
+```bash
+# Setup picli tool
+curl https://raw.githubusercontent.com/virt-s1/perf-insight/main/cli_tool/picli -o /bin/picli
+curl https://raw.githubusercontent.com/virt-s1/perf-insight/main/cli_tool/.picli.toml -o ~/.picli.toml
+
+chmod a+x /bin/picli
+sed -i 's/localhost:5000/perf-insight.lab.eng.pek2.redhat.com:5000/' ~/.picli.toml
+
+pip3 install click tabulate --user
+```
+
+### 2.2 Store logs on perf-insight
 
 Command:
 
 ```bash
 mkdir /nfs-mount
 mount -t nfs perf-insight.lab.eng.pek2.redhat.com:/nfs/perf-insight/.staging /nfs-mount
-log_path="/nfs-mount/$testrun_id"
-mkdir -p $log_path
+log_path="/nfs-mount/${testrun_id}"
+mkdir -p ${log_path}
 ```
 
-Notes:
-- Currently, we deliver logs to the perf-insight server via NFS.
+> Notes: The logs will be delieverd to the perf-insight server via NFS.
+
+### 2.3 Store logs on pbench-server
+
+TBD
+
+`log_path=/var/lib/pbench-agent`
 
 ## 3. Generate metadata.json file
 
 Command:
 
 ```bash
-./write_metadata.py --file $log_path/metadata.json \
-    --keypair testrun-id=$testrun_id \
+./write_metadata.py --file ${log_path}/metadata.json \
+    --keypair testrun-id=${testrun_id} \
     --keypair testrun-type=fio \
     --keypair testrun-platform=ESXi \
     --keypair ......
@@ -119,7 +144,8 @@ Command:
      --test-types randrw --block-sizes 4 --iodepth 1,64 --numjobs 1,16 --samples 3 --runtime 10
 
 # Or, reproduce the failure cases from a benchmark report
-./pick_up_cases.py --report-id <Benchmark Report ID>
+report_id=<Report ID>   # Ex. "benchmark_xxxxxxxx_over_xxxxxxxx"
+./pick_up_cases.py --report-id ${report_id}
 ./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode backlog
 ```
 
@@ -174,36 +200,50 @@ Notes:
 
 ## 5. Deliver TestRun results
 
+### 5.1 Store logs on perf-insight
+
 Command:
 
 ```bash
-mv /var/lib/pbench-agent/${testrun_id}* $log_path
-chcon -R -u system_u -t svirt_sandbox_file_t $log_path
+mv /var/lib/pbench-agent/${testrun_id}* ${log_path}
+chcon -R -u system_u -t svirt_sandbox_file_t ${log_path}
 ```
 
-Notes:
-- Currently, we deliver logs to the perf-insight server via NFS.
+> Notes: The logs will be delieverd to the perf-insight server via NFS.
 
+### 5.2 Store logs on pbench-server
 
-## 6. Load the results into database and generate benchmark report
+TBD
+
+## 6. Load TestRun into perf-insight system
+
+### 6.1 Store logs on perf-insight
 
 Command:
 
 ```bash
-# Setup picli tool
-curl https://raw.githubusercontent.com/virt-s1/perf-insight/main/cli_tool/picli -o /bin/picli
-curl https://raw.githubusercontent.com/virt-s1/perf-insight/main/cli_tool/.picli.toml -o ~/.picli.toml
-
-chmod a+x /bin/picli
-sed -i 's/localhost:5000/perf-insight.lab.eng.pek2.redhat.com:5000/' ~/.picli.toml
-
-pip3 install click tabulate --user
-
-# Load the results into database
+# Load the TestRun into perf-insight
 picli testrun-load --testrun-id ${testrun_id}
+```
 
+### 6.2 Store logs on pbench-server
+
+Command:
+
+```bash
+# Import the TestRun into perf-insight
+picli testrun-import --testrun-id ${testrun_id}  # TBD
+```
+
+> Notes: We are still enhancing this interface. See `picli testrun-import --help` for more information.
+
+## 7. Postprocess to the data
+
+Command:
+
+```bash
 # Generate benchmark report
-base_id=<base_testrun_id>
+base_id=<Base TestRunID>
 picli benchmark-create --test-id ${testrun_id} --base-id ${base_id}
 report_id=benchmark_${testrun_id}_over_${base_id}
 
@@ -211,17 +251,16 @@ report_id=benchmark_${testrun_id}_over_${base_id}
 if ! (jq --version); then sudo dnf install -y jq; fi
 
 # Report URL (http://...)
-picli --output-format json benchmark-inspect --report-id $report_id | jq -r '.url'
+picli --output-format json benchmark-inspect --report-id ${report_id} | jq -r '.url'
 
 # Benchmark Conclusion (PASS/FAIL)
-picli --output-format json benchmark-inspect --get-statistics true --report-id $report_id | jq -r '.statistics.benchmark_result'
+picli --output-format json benchmark-inspect --get-statistics true --report-id ${report_id} | jq -r '.statistics.benchmark_result'
 
 # The number of DR cases (0 or 1,2,3,...)
-picli --output-format json benchmark-inspect --get-statistics true --report-id $report_id | jq -r '.statistics.case_num_dramatic_regression'
+picli --output-format json benchmark-inspect --get-statistics true --report-id ${report_id} | jq -r '.statistics.case_num_dramatic_regression'
 ```
 
 Notes:
-- This is a temporary solution to perform these actions using `ssh`. Therefore, you will need to handle the authentication of ssh keypairs by yourself.
 - Don't forget to install the `jq` package first (it has already been installed on perf-insight.lab.eng.pek2.redhat.com).
 - You can get the Report URL to send with your email.
 
