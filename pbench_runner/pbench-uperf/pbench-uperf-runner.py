@@ -33,7 +33,7 @@ parser.add_argument("--client_ip", required=True,
 parser.add_argument("--config", required=True,
                     help="Unique ID for whole test.")
 parser.add_argument("--test_suite_name",
-                    choices=['quick', 'standard', 'extended'],
+                    choices=['quick', 'standard', 'extended', 'backlog'],
                     help="Run as the pre-defined testsuite. "
                     "(By using this, below args will be overwriten)")
 parser.add_argument("--protocols", "-p",
@@ -59,7 +59,7 @@ parser.add_argument("--backlog-file",
 parser.add_argument('--dry-run',
                     dest='dry_run',
                     action='store_true',
-                    help='Parse the arguments only without running any test cases.',
+                    help='Only parse the parameters without running any test cases.',
                     default=None,
                     required=False)
 
@@ -189,16 +189,16 @@ if __name__ == '__main__':
             print('No testcases have been found in backlog.')
             exit(0)
 
-        for args in testcases:
+        for testcase in testcases:
             # Get default arguments
             (protocols, test_types, runtime, message_sizes, instances,
              nr_samples, max_failures, maxstddevpct) = test_suites('standard')
 
             # Update for the current testcase
-            test_types = args.get('test-types')
-            protocols = args.get('protocols')
-            message_sizes = args.get('message-sizes')
-            instances = args.get('instances')
+            test_types = testcase.get('test-types')
+            protocols = testcase.get('protocols')
+            message_sizes = testcase.get('message-sizes')
+            instances = testcase.get('instances')
 
             # Run test testcase
             run(server_ip, client_ip, config, protocols, test_types, runtime,
