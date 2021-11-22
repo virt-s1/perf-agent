@@ -106,10 +106,15 @@ if __name__ == '__main__':
                 'iodepth': case.get('IOdepth'),
                 'numjobs': case.get('Numjobs')
             }
-        elif '' in case:
+        elif 'TestType' in case:
             # pbench-uperf parameters
-            # TODO: implement it
-            args = {}
+            args = {
+                'CASE_ID':  case.get('CaseID'),
+                'test-types': case.get('TestType'),
+                'protocols': case.get('Protocol'),
+                'message-sizes': case.get('MSize'),
+                'instances': case.get('Instance')
+            }
         else:
             LOG.error('Unrecognized TestRun Type.')
             exit(1)
