@@ -34,6 +34,13 @@ ARG_PARSER.add_argument(
     default=None,
     required=True)
 ARG_PARSER.add_argument(
+    '--case-filter',
+    dest='case_filters',
+    action='append',
+    help='The conclusion(s) for filtering testcases.',
+    default=[],
+    required=False)
+ARG_PARSER.add_argument(
     '--backlog-file',
     dest='backlog_file',
     action='store',
@@ -49,6 +56,8 @@ if __name__ == '__main__':
 
     report_id = ARGS.report_id
     backlog_file = ARGS.backlog_file
+    case_filters = ARGS.case_filters if ARGS.case_filters else [
+        'Dramatic Regression']
 
     # Get the statistics from the benchmark report
     LOG.info('Getting the statistics from the benchmark report...')
@@ -76,9 +85,10 @@ if __name__ == '__main__':
 
     # Filter failure cases
     LOG.info('Filtering failure cases...')
+    LOG.debug('Conclusion Filter: {}'.format(case_filters))
 
     failed_cases = [x for x in testcases if x.get(
-        'Conclusion') == 'Dramatic Regression']
+        'Conclusion') in case_filters]
 
     LOG.info('Got {} failure case(s).'.format(len(failed_cases)))
 
