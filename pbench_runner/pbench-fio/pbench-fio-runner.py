@@ -35,15 +35,17 @@ ARG_PARSER.add_argument(
     '--targets',
     dest='targets',
     action='store',
-    help='The pbench-fio targets argument.',
+    help='[pbench-fio] targets argument.',
     default=None,
     required=True)
 ARG_PARSER.add_argument(
     '--mode',
     dest='mode',
     action='store',
-    help='The pre-defined testing mode.',
-    choices=['quick', 'standard', 'extended', 'customized', 'backlog'],
+    help='The pre-defined mode from profile. Such as "quick", "standard", \
+"extended", "backlog", etc... When adding your own mode, please make sure \
+it is defined in the profile (see "customized" mode as an example).',
+    default=None,
     required=True)
 ARG_PARSER.add_argument(
     '--profile',
@@ -63,49 +65,49 @@ ARG_PARSER.add_argument(
     '--test-types',
     dest='test_types',
     action='store',
-    help='The pbench-fio test-types argument.',
+    help='[pbench-fio] test-types argument.',
     default=None,
     required=False)
 ARG_PARSER.add_argument(
     '--block-sizes',
     dest='block_sizes',
     action='store',
-    help='The pbench-fio block-sizes argument.',
+    help='[pbench-fio] block-sizes argument.',
     default=None,
     required=False)
 ARG_PARSER.add_argument(
     '--iodepth',
     dest='iodepth',
     action='store',
-    help='The pbench-fio iodepth argument.',
+    help='[pbench-fio] iodepth argument.',
     default=None,
     required=False)
 ARG_PARSER.add_argument(
     '--numjobs',
     dest='numjobs',
     action='store',
-    help='The pbench-fio numjobs argument.',
+    help='[pbench-fio] numjobs argument.',
     default=None,
     required=False)
 ARG_PARSER.add_argument(
     '--samples',
     dest='samples',
     action='store',
-    help='The pbench-fio samples argument.',
+    help='[pbench-fio] samples argument.',
     default=None,
     required=False)
 ARG_PARSER.add_argument(
     '--runtime',
     dest='runtime',
     action='store',
-    help='The pbench-fio runtime argument.',
+    help='[pbench-fio] runtime argument.',
     default=None,
     required=False)
 ARG_PARSER.add_argument(
     '--dry-run',
     dest='dry_run',
     action='store_true',
-    help='Parse the arguments only without running any test cases.',
+    help='Only parse the parameters without running any test cases.',
     default=None,
     required=False)
 
@@ -121,16 +123,16 @@ if __name__ == '__main__':
         exit(1)
 
     if ARGS.mode in ('quick', 'standard', 'extended'):
-        # No pbench-fio arguments should be specified
+        # No pbench-fio arguments should be specified in these modes
         if (ARGS.test_types is not None
                 or ARGS.block_sizes is not None
                 or ARGS.iodepth is not None
                 or ARGS.numjobs is not None
                 or ARGS.samples is not None
                 or ARGS.runtime is not None):
-            LOG.error('Cannot overwrite "test_types", "block_sizes", '
-                      '"iodepth", "numjobs", "samples", "runtime" arguments '
-                      'in specified mode.')
+            LOG.error('"quick", "standard" and "extended" are system \
+reserved modes. Therefore "test_types", "block_sizes", "iodepth", "numjobs", \
+"samples", and "runtime" arguments cannot be overwritten by CLI.')
             exit(1)
 
     if ARGS.mode == 'backlog':
@@ -143,23 +145,30 @@ if __name__ == '__main__':
                 or ARGS.block_sizes is not None
                 or ARGS.iodepth is not None
                 or ARGS.numjobs is not None):
-            LOG.error('Cannot overwrite "test_types", "block_sizes", '
-                      '"iodepth", "numjobs" arguments in "backlog" mode.')
+            LOG.error('"backlog" is a system reserved mode. Therefore \
+"test_types", "block_sizes", "iodepth", "numjobs", "samples", and "runtime" \
+arguments cannot be overwritten by CLI.')
             exit(1)
 
-    # Gather pbench-fio arguments
+    # Gather pbench-fio arguments from profile
     LOG.info('Gathering pbench-fio arguments...')
 
     try:
         with open(ARGS.profile, 'r') as f:
-            profile = toml.load(f)
+            profiles = toml.load(f)
     except Exception as err:
         LOG.error('Failed to load the profile: {}'.format(err))
         exit(1)
 
-    arguments = profile.get('DEFAULT', {})
-    arguments.update(profile.get(ARGS.mode, {}))
+    if ARGS.mode not in profiles:
+        LOG.error('The mode "{}" is not defined in profile {}'.format(
+            ARGS.mode, ARGS.profile))
+        exit(1)
 
+    arguments = profiles.get('DEFAULT', {})
+    arguments.update(profiles.get(ARGS.mode, {}))
+
+    # Overwrite with CLI arguments
     arguments.update({'config': testrun_id[4:]})
     arguments.update({'targets': ARGS.targets})
 
@@ -195,7 +204,7 @@ if __name__ == '__main__':
 
         for args in testcases:
             args.pop('CASE_ID', None)
-            
+
             _pbench_fio_args = arguments.copy()
             _pbench_fio_args.update(args)
             pbench_fio_runs.append(_pbench_fio_args)

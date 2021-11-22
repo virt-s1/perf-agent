@@ -14,11 +14,14 @@
 #   v0.0.2 - 04/02/2021 - Bo Yang - Enhanced arguments output.
 #   v0.0.3 - 11/16/2021 - Charles Shih - PEP 8 formating.
 #   v0.0.4 - 11/16/2021 - Charles Shih - Update the help message.
+#   v0.1.0 - 11/22/2021 - Charles Shih - Add support to the backlog.
+#   v0.1.1 - 11/22/2021 - Charles Shih - Add dry-run parameter.
 
 
 import os
 import argparse
 import subprocess
+import toml
 
 
 parser = argparse.ArgumentParser(description="Arguments of Pbench-uperf.")
@@ -30,7 +33,7 @@ parser.add_argument("--client_ip", required=True,
 parser.add_argument("--config", required=True,
                     help="Unique ID for whole test.")
 parser.add_argument("--test_suite_name",
-                    choices=['quick', 'standard', 'extended'],
+                    choices=['quick', 'standard', 'extended', 'backlog'],
                     help="Run as the pre-defined testsuite. "
                     "(By using this, below args will be overwriten)")
 parser.add_argument("--protocols", "-p",
@@ -47,6 +50,18 @@ parser.add_argument("--max_failures", "-mf",
                     help="Max failures times of one case.")
 parser.add_argument("--maxstddevpct", "-ms",
                     help="Max stddevpct to check.")
+parser.add_argument("--backlog-file",
+                    dest='backlog_file',
+                    action='store',
+                    help='The backlog file with the testcases to run.',
+                    default='backlog.toml',
+                    required=False)
+parser.add_argument('--dry-run',
+                    dest='dry_run',
+                    action='store_true',
+                    help='Only parse the parameters without running any test cases.',
+                    default=None,
+                    required=False)
 
 args = parser.parse_args()
 
@@ -96,6 +111,15 @@ def test_suites(test_suite_name):
 def run(server_ip, client_ip, config, protocols, test_types, runtime,
         message_sizes, instances, nr_samples, max_failures, maxstddevpct):
 
+    print("protocols: ", protocols)
+    print("test_types: ", test_types)
+    print("instances: ", instances)
+    print("runtime: ", runtime)
+    print("message_sizes: ", message_sizes)
+    print("nr_samples: ", nr_samples)
+    print("max_failures: ", max_failures)
+    print("maxstddevpct: ", maxstddevpct)
+
     command = "pbench-uperf "
     command += "-S {} ".format(server_ip)
     command += "-C {} ".format(client_ip)
@@ -120,9 +144,12 @@ def run(server_ip, client_ip, config, protocols, test_types, runtime,
         command += "--max-stddev={} ".format(maxstddevpct)
     print("DEBUG: command:", command)
 
-    ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE, encoding="utf-8")
-    # Store ret.stdout to a file.
+    if not args.dry_run:
+        # ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE,
+        #                      stderr=subprocess.PIPE, encoding="utf-8")
+        # # Store ret.stdout to a file.
+
+        subprocess.run(command, shell=True, encoding='utf-8')
 
 
 # Main.
@@ -145,18 +172,43 @@ if __name__ == '__main__':
         nr_samples = args.nr_samples
         max_failures = args.max_failures
         maxstddevpct = args.maxstddevpct
+
+        run(server_ip, client_ip, config, protocols, test_types, runtime,
+            message_sizes, instances, nr_samples, max_failures, maxstddevpct)
+    elif test_suite_name == 'backlog':
+        # Get users arguments from commands when test_suite_name is null.
+        print('INFO: Run users parameters in backlog mode.')
+
+        if args.backlog_file is None:
+            print('The "backlog-file" must be specified in "backlog" mode.')
+            exit(1)
+        else:
+            with open(args.backlog_file, 'r') as f:
+                backlog = toml.load(f)
+
+        testcases = backlog.get('testcases', [])
+        if not testcases:
+            print('No testcases have been found in backlog.')
+            exit(0)
+
+        for testcase in testcases:
+            # Get default arguments
+            (protocols, test_types, runtime, message_sizes, instances,
+             nr_samples, max_failures, maxstddevpct) = test_suites('standard')
+
+            # Update for the current testcase
+            test_types = testcase.get('test-types')
+            protocols = testcase.get('protocols')
+            message_sizes = testcase.get('message-sizes')
+            instances = testcase.get('instances')
+
+            # Run test testcase
+            run(server_ip, client_ip, config, protocols, test_types, runtime,
+                message_sizes, instances, nr_samples, max_failures, maxstddevpct)
     else:
         print("INFO: Run test suite.")
         (protocols, test_types, runtime, message_sizes, instances, nr_samples,
          max_failures, maxstddevpct) = test_suites(test_suite_name)
 
-    print("protocols: ", protocols)
-    print("test_types: ", test_types)
-    print("instances: ", instances)
-    print("runtime: ", runtime)
-    print("message_sizes: ", message_sizes)
-    print("nr_samples: ", nr_samples)
-    print("max_failures: ", max_failures)
-    print("maxstddevpct: ", maxstddevpct)
-    run(server_ip, client_ip, config, protocols, test_types, runtime,
-        message_sizes, instances, nr_samples, max_failures, maxstddevpct)
+        run(server_ip, client_ip, config, protocols, test_types, runtime,
+            message_sizes, instances, nr_samples, max_failures, maxstddevpct)

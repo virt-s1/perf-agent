@@ -109,38 +109,29 @@ Command:
 # Check target volume
 [ -b /dev/sdx ] || exit 1
 
-# Run pbench-fio tests (standard) (deprecated)
-# ./pbench-fio.wrapper --config=${testrun_id#*_} \
-#     --job-file=./fio-default.job --samples=5 \
-#     --targets=/dev/sdx --job-mode=concurrent \
-#     --pre-iteration-script=./drop-cache.sh \
-#     --test-types=read,write,rw,randread,randwrite,randrw \
-#     --block-sizes=4,64,1024 --runtime=30 \
-#     --iodepth=1,8,64 --numjobs=1,16
-
 # Run pre-defined pbench-fio tests in a quick/standard/extended mode
 ./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode <quick|standard|extended>
 
-# Or, run a series of custom tests
+# Or, run a bunch of custom tests
 ./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode customized \
      --test-types rw --block-sizes 1024 --iodepth 1,64 --numjobs 1,16 --samples 3 --runtime 10
 ./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode customized \
      --test-types randrw --block-sizes 4 --iodepth 1,64 --numjobs 1,16 --samples 3 --runtime 10
 
 # Or, reproduce the failure cases from a benchmark report
-./pick_up_failure_cases.py --report-id <Benchmark Report ID>
+./pick_up_cases.py --report-id <Benchmark Report ID>
 ./pbench-fio-runner.py --testrun-id ${testrun_id} --targets /dev/sdx --mode backlog
 ```
 
 Notes:
-- (deprecated) `pbench-fio.wrapper` is a workaround to support iteration on `iodepth` and `numjobs` to meet QE requirments. It keeps the same usage of `pbench-fio`.
-- (deprecated) `${testrun_id#*_}` is the remaining part without TestType, so that pbench generates test logs into `/var/lib/pbench-agent/TestRunID_*` folders.
-- This script **can be run multiple times** to complete your testing, all the results will be collected as the whole TestRun.
+- The script `pbench-fio-runner.py` **can be run multiple times** to complete your testing, all the results will be collected as the whole TestRun.
+- The `--mode` parameter in `pbench-fio-runner.py` can be any predefined test dimension (see below) defined in the `profiles.toml` file. In addition, there is a special mode called "backlog", which runs tests based on a specified backlog file.
 - The different test dimension meet difference test requirements, the details can be found in the table below.
   - "all_types" stands for "read,write,rw,randread,randwrite,randrw".
   - `ramptime` is set to 5 seconds for the tests, so `runtime=10` can be valid.
   - It is strongly recommended to put the dimension keywords in TestRunID.
   - To use any customized dimension other than the listed, put the "customized" keyword in TestRunID.
+- The script `pick_up_cases.py` is used to create a backlog from the benchmark report. By default, it only filters "Dramatic Regression" cases, but this behavior can be overridden by specifying the `--case-filter` parameter. For example, `--case-filter 'Dramatic Regression' --case-filter 'High Variance'` will collect both "Dramatic Regression" and "High Variance" cases into the backlog file.
 
 | Dimension | Duration | test-types | block-sizes      | iodepth     | numjobs   | samples | runtime |
 | :-------- | :------- | :--------- | :--------------- | :---------- | :-------- | :------ | :------ |
@@ -156,8 +147,12 @@ Command:
 # Run pbench-uperf-runner tests (quick)
 ./pbench-uperf-runner.py --server_ip SERVER_IP --client_ip CLIENT_IP --config ${testrun_id#*_} --test_suite_name quick
 
-More:
+# More
 ./pbench-uperf-runner.py --help
+
+# Reproduce the failure cases from a benchmark report
+./pick_up_cases.py --report-id <Benchmark Report ID>
+./pbench-uperf-runner.py --server_ip SERVER_IP --client_ip CLIENT_IP --config ${testrun_id#*_} --test_suite_name backlog
 ```
 
 Notes:
@@ -168,6 +163,7 @@ Notes:
   - "all_types" stands for "stream,maerts,bidirec,rr".
   - It is strongly recommended to put the dimension keywords in TestRunID.
   - To use any customized dimension other than the listed, put the "customized" keyword in TestRunID.
+- The scrip `pbench-uperf-runner.py` supports run in the backlog mode by specifying `--test_suite_name quick` as `backlog`. See the "pbench-fio" section for more information.
 
 | Dimension | Duration | test_types | message_sizes   | protocols | instances | samples | runtime |
 | :-------- | :------- | :--------- | :-------------- | :-------- | :-------- | :------ | :------ |

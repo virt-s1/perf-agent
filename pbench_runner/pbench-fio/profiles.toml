@@ -1,6 +1,6 @@
 [DEFAULT]
-# config        # will be specified by user
-# targets       # will be specified by user
+# config        # Must be provided by CLI
+# targets       # Must be provided by CLI
 job-file="./fio-default.job"
 pre-iteration-script="./drop-cache.sh"
 job-mode="concurrent"
