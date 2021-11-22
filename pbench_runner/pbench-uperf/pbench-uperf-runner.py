@@ -145,9 +145,11 @@ def run(server_ip, client_ip, config, protocols, test_types, runtime,
     print("DEBUG: command:", command)
 
     if not args.dry_run:
-        ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE, encoding="utf-8")
-        # Store ret.stdout to a file.
+        # ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE,
+        #                      stderr=subprocess.PIPE, encoding="utf-8")
+        # # Store ret.stdout to a file.
+
+        subprocess.run(command, shell=True, encoding='utf-8')
 
 
 # Main.
