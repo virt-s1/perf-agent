@@ -15,6 +15,7 @@
 #   v0.0.3 - 11/16/2021 - Charles Shih - PEP 8 formating.
 #   v0.0.4 - 11/16/2021 - Charles Shih - Update the help message.
 #   v0.1.0 - 11/22/2021 - Charles Shih - Add support to the backlog.
+#   v0.1.1 - 11/22/2021 - Charles Shih - Add dry-run parameter.
 
 
 import os
@@ -54,6 +55,12 @@ parser.add_argument("--backlog-file",
                     action='store',
                     help='The backlog file with the testcases to run.',
                     default='backlog.toml',
+                    required=False)
+parser.add_argument('--dry-run',
+                    dest='dry_run',
+                    action='store_true',
+                    help='Parse the arguments only without running any test cases.',
+                    default=None,
                     required=False)
 
 args = parser.parse_args()
@@ -137,9 +144,10 @@ def run(server_ip, client_ip, config, protocols, test_types, runtime,
         command += "--max-stddev={} ".format(maxstddevpct)
     print("DEBUG: command:", command)
 
-    ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE, encoding="utf-8")
-    # Store ret.stdout to a file.
+    if not args.dry_run:
+        ret = subprocess.run(command, shell=True, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, encoding="utf-8")
+        # Store ret.stdout to a file.
 
 
 # Main.
