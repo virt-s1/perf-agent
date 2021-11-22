@@ -147,8 +147,12 @@ Command:
 # Run pbench-uperf-runner tests (quick)
 ./pbench-uperf-runner.py --server_ip SERVER_IP --client_ip CLIENT_IP --config ${testrun_id#*_} --test_suite_name quick
 
-More:
+# More
 ./pbench-uperf-runner.py --help
+
+# Reproduce the failure cases from a benchmark report
+./pick_up_cases.py --report-id <Benchmark Report ID>
+./pbench-uperf-runner.py --server_ip SERVER_IP --client_ip CLIENT_IP --config ${testrun_id#*_} --test_suite_name backlog
 ```
 
 Notes:
@@ -159,6 +163,7 @@ Notes:
   - "all_types" stands for "stream,maerts,bidirec,rr".
   - It is strongly recommended to put the dimension keywords in TestRunID.
   - To use any customized dimension other than the listed, put the "customized" keyword in TestRunID.
+- The scrip `pbench-uperf-runner.py` supports run in the backlog mode by specifying `--test_suite_name quick` as `backlog`. See the "pbench-fio" section for more information.
 
 | Dimension | Duration | test_types | message_sizes   | protocols | instances | samples | runtime |
 | :-------- | :------- | :--------- | :-------------- | :-------- | :-------- | :------ | :------ |
