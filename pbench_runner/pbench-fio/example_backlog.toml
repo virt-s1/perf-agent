@@ -1,0 +1,23 @@
+[[testcases]]
+test-types = "randread"
+block-sizes = "4k"
+iodepth = 1
+numjobs = 128
+
+[[testcases]]
+test-types = "rw"
+block-sizes = "4k"
+iodepth = 8
+numjobs = 1
+
+[[testcases]]
+test-types = "write"
+block-sizes = "4k"
+iodepth = 64
+numjobs = 1
+
+[[testcases]]
+test-types = "write"
+block-sizes = "64k"
+iodepth = 8
+numjobs = 1

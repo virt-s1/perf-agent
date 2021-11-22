@@ -1,0 +1,23 @@
+[[testcases]]
+test-types = "bidirec"
+protocols = "tcp"
+message-sizes = 1024
+instances = 1
+
+[[testcases]]
+test-types = "rr"
+protocols = "tcp"
+message-sizes = 1024
+instances = 8
+
+[[testcases]]
+test-types = "stream"
+protocols = "tcp"
+message-sizes = 64
+instances = 1
+
+[[testcases]]
+test-types = "rr"
+protocols = "udp"
+message-sizes = 1024
+instances = 1

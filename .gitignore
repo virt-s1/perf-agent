@@ -130,3 +130,4 @@ dmypy.json
 
 # User defined
 pbench_runner/pbench-fio/backlog.toml
+pbench_runner/pbench-uperf/backlog.toml
