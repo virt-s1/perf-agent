@@ -1,10 +1,14 @@
-# Use pbench setup Ansible scripts
+# The pbench setup scripts
 
-## Update ansible_vars.yaml
+These scripts are designed to run on your laptop or master node (if you use Jenkins CI) to remotely set up a test machine using Ansible.
 
-The `./ansible_vars.yaml` cantains the options for setting up pbench. It looks like:
+# Usage
 
-```
+## 1. Update ansible_vars.yaml
+
+The `./ansible_vars.yaml` cantains the options for setting up pbench. It could be like this:
+
+```yml
 ---
 config_info:
   system_type: local
@@ -20,44 +24,58 @@ config_info:
   dev_env_install: 1
 ```
 
-The `system_type` can be one of the following values:
-- local - run for local VMs inside Red Hat network;
-- aws   - run for AWS instances;
-- azure - run for the Azure instances;
+Notes:
+1. The `system_type` can be one of the following values:
+   1. local - run for local BMs or VMs inside Red Hat network;
+   2. aws - run for AWS instances;
+   3. azure - run for the Azure instances;
+   4. alibaba - run for the Alibaba instances;
+2. At this time, `os_vendor` can only be `rhel`.
+3. If you want to install additional packages, set `package_install` to `1` and provision `package_list` according to your needs, otherwise set it to `0`.
+4. Set `pbench_install` to `1` for pbench installation, otherwise set to `0`.
+5. Set `dev_env_install` to `1` to install `@Development tools` for uperf, otherwise set to `0`.
 
-The `os_vendor` can only be `rhel` at this moment.
-
-Set `package_install` as `1` and provision `package_list` according to your needs if you want to install additional packages, other wise set it as `0`.
-
-Set `pbench_install` as `1` to perform pbench installation, other wise set it as `0`.
-
-Set `dev_env_install` as `1` to install `@Development tools` for uperf, other wise set it as `0`.
-
-## Configure ansible.cfg
+## 2. Configure ansible.cfg
 
 The `./ansible.cfg` provides Ansible the basic configurations. It could be like this:
 
-```
+```ini
 [defaults]
 remote_user=root
-#private_key_file=~/.pem/rhui-dev-cheshi.pem
+log_path=./ansible.log
+#private_key_file=~/.pem/cheshi.pem
+
+[ssh_connection]
+ssh_args="-C -o ControlMaster=auto -o ControlPersist=20m"
 ```
 
-Provision `remote_user` and `private_key_file` to let Ansible know how to connect to the host.
+Notes:
+- Provision `remote_user` and `private_key_file` to let Ansible know how to connect to your test machine.
 
-## Provision inventory
+## 3. Provision inventory
 
-The `./inventory` file tells Ansible which host(s) to be connected.
+The `./inventory` file tells Ansible which test machine to connect and set up. It could be like this:
 
-If you need to setup pbench on more than one host. You can list all the IPs in the inventory file. Just like this:
-
+```ini
+54.201.27.5
+54.201.27.6
+#54.202.189.22 ansible_ssh_extra_args="-R 8080:localhost:3128"
+#54.202.189.23 ansible_ssh_extra_args="-R 8080:localhost:3128"
 ```
-54.201.247.22
-54.202.189.64 ansible_ssh_extra_args="-R 8080:localhost:3128"
-```
 
-When using private image on clouds, you might consider enabling the "ssh reverse proxy". You can do this by adding `ansible_ssh_extra_args` option to the specific host.
+Notes:
+- If you need to setup pbench on multiple test machines. You can list all of them in the inventory file. Just like the example above.
+- When using a private image on clouds, you might consider enabling the "ssh reverse proxy" by adding the `ansible_ssh_extra_args` option to the specific host. In this case, you need to set up an http proxy on the Ansible host (`localhost`), or change `localhost` to any existing proxy server that the Ansible host can access.
 
-## Execute setup.sh
+## 4. Execute setup.sh
 
-Finally, you can execute `./setup.sh` to start the setup process.
+Execute `./setup.sh` to start the setup process.
+
+Notes:
+- This script will download the latest sshkey and config files from Red Hat intranet if you didn't provide them.
+- Thus if you want to use your own sshkey and config files, you should put them into `./config` before running `setup.sh`.
+
+Notes:
+- The latest sshkey and config files are required to use `pbench-copy-results`.
+- Script `setup.sh` will download the latest sshkey and config files from the Red Hat intranet for you.
+- In addition, if you want to use your own sshkey and config files, you should put them in `./config` before running `setup.sh`. (Check the code for more details)
