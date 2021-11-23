@@ -36,7 +36,7 @@
 
 - name: Copy local pbench-agent.cfg - cloud
   block:
-    - name: Copy pbench-agent.cfg
+    - name: Copy pbench-agent.cfg (cloud)
       copy:
         src: "{{ working_dir }}/config/pbench-agent-cloud.cfg"
         dest: /opt/pbench-agent/config/pbench-agent.cfg
@@ -47,7 +47,7 @@
 
 - name: Copy local pbench-agent.cfg - local
   block:
-    - name: Copy pbench-agent.cfg
+    - name: Copy pbench-agent.cfg (local)
       copy:
         src: "{{ working_dir }}/config/pbench-agent-production.cfg"
         dest: /opt/pbench-agent/config/pbench-agent.cfg
@@ -58,7 +58,7 @@
 
 - name: Copy external id_rsa in place for clouds
   block:
-    - name: Copy id_rsa
+    - name: Copy id_rsa (cloud)
       copy:
         src: "{{ working_dir }}/config/id_rsa.cloud"
         dest: "/opt/pbench-agent/id_rsa"
@@ -67,7 +67,7 @@
 
 - name: Copy external id_rsa in place for local systems
   block:
-    - name: Copy id_rsa
+    - name: Copy id_rsa (local)
       copy:
         src: "{{ working_dir }}/config/id_rsa"
         dest: "/opt/pbench-agent/id_rsa"
