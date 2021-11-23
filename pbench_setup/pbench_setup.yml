@@ -15,6 +15,11 @@
       when:
         - config_info.system_type == "azure"
 
+    - name: Configure environment (Alibaba)
+      script: ./bin/configure_alibaba_environment.sh
+      when:
+        - config_info.system_type == "alibaba"
+
     - name: package installation
       block:
         - name: install_pkgs
