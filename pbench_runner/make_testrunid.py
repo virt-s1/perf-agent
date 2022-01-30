@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Make TestRunID.
 
 Make TestRunID based on the information provided by the user.

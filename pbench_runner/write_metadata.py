@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Write metadata to a json file.
 
 Write user provided metadata entries to a specified json file.
