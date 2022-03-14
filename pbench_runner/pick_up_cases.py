@@ -102,7 +102,7 @@ if __name__ == '__main__':
             args = {
                 'CASE_ID':  case.get('CaseID'),
                 'test-types': case.get('RW'),
-                'block-sizes': case.get('BS'),
+                'block-sizes': case.get('BS', '').rstrip('k'),
                 'iodepth': case.get('IOdepth'),
                 'numjobs': case.get('Numjobs')
             }
