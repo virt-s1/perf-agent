@@ -1,5 +1,9 @@
 ---
-coprdistro: "{{ 'epel-8-$basearch'
+coprdistro: "{{ 'centos-stream-9-$basearch'
+   if ansible_distribution == 'RedHat' and
+   ansible_distribution_major_version == '9'
+   else
+   'epel-8-$basearch'
    if ansible_distribution == 'RedHat' and
    ansible_distribution_major_version == '8'
    else
@@ -9,7 +13,7 @@ coprdistro: "{{ 'epel-8-$basearch'
    else
    'epel-6-$basearch'
    if ansible_distribution == 'RedHat' and
-   ansible_distribution_major_version == '7'
+   ansible_distribution_major_version == '6'
    else
    'fedora-$releasever-$basearch'
    if ansible_distribution == 'Fedora'
