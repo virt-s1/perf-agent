@@ -200,6 +200,8 @@ Notes:
 
 ## 5. Deliver TestRun results
 
+You can choose deliver the results to either perf-insight or pbench-server (preferred).
+
 ### 5.1 Store logs on perf-insight
 
 Command:
@@ -213,29 +215,68 @@ chcon -R -u system_u -t svirt_sandbox_file_t ${log_path}
 
 ### 5.2 Store logs on pbench-server
 
-TBD
+Command:
+
+The default pbench-server is `pbench.perf.lab.eng.bos.redhat.com`.
+
+```bash
+# Specify the path to the metadata file
+metadata_file=./metadata.json
+
+# Specify the username on the pbench-server
+pbench_username=virt-perftest-test
+
+# Get args for pbench-copy-results
+test_machine=$(cat ${metadata_file} | jq -r '."guest-flavor"')
+testrun_id=$(cat ${metadata_file} | jq -r '."testrun-id"')
+
+# Copy metadata.json into each subfolder
+for d in $(ls -d ${testrun_id}*); do rm -f $d/${metadata_file}; cp ${metadata_file} $d; done
+
+# Upload the logs to pbench-server
+pbench-copy-results --user=${pbench_username} --controller=${test_machine} --prefix=${testrun_id}
+```
+
+Notes:
+- `pbench_username` should be one of the following values:
+  - `virt-perftest-test` for debugging or demostration;
+  - `virt-perftest-aws` for AWS production;
+  - `virt-perftest-aliyun` for Aliyun production;
+  - `virt-perftest-azure` for Azure production;
+  - `virt-perftest-esxi` for ESXi production;
+  - `virt-perftest-hyperv` for Hyper-V production;
+- Using `pbench-copy-results` rather than `pbench-move-results`
+- `pbench-copy-results` will create `*.copied` file to avoid duplicate copies.
 
 ## 6. Load TestRun into perf-insight system
 
-### 6.1 Store logs on perf-insight
+Based on where you have delivered the results to, you can either load the results from the perf-insight or import results from the pbench-server (preferred).
+
+### 6.1 Logs stored on perf-insight
 
 Command:
 
 ```bash
-# Load the TestRun into perf-insight
+# Load the results from perf-insight
 picli testrun-load --testrun-id ${testrun_id}
 ```
 
-### 6.2 Store logs on pbench-server
+### 6.2 Logs stored on pbench-server
+
+The default pbench-server is `pbench.perf.lab.eng.bos.redhat.com`.
 
 Command:
 
 ```bash
-# Import the TestRun into perf-insight
-picli testrun-import --testrun-id ${testrun_id}  # TBD
+# Import a bunch of TestRun results from pbench-server
+picli testrun-imports --pbench-user ${pbench_username} --pbench-controller ${test_machine} --pbench-prefix ${testrun_id}
 ```
 
-> Notes: We are still enhancing this interface. See `picli testrun-import --help` for more information.
+Notes:
+- `picli testrun-imports` will help you import all the related testruns.
+- Or you can use `picli testrun-import` to import testruns manally, that's an old method, in this way:
+  - The External URLs will be `http://pbench.perf.lab.eng.bos.redhat.com/users/${pbench_username}/${test_machine}/${testrun_id}/${testrun_id}_*/` if your test machine is inside of the Red Hat network (ex. local VMs).
+  - Or, you need to add `EC2::` before `${test_machine}` in the URL for external test machines (ex. public clouds)
 
 ## 7. Postprocess to the data
 
