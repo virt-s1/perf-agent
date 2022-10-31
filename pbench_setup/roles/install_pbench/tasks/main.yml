@@ -92,3 +92,4 @@
   with_items:
     - uperf
     - fio
+    - perf
