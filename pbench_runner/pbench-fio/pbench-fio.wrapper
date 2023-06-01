@@ -21,6 +21,16 @@ for arg in $@; do
         continue
     fi
 
+    if [[ "$arg" =~ ^--block-sizes= ]]; then
+        bs_tag=$(echo $arg | cut -d= -f2 | tr ',' '_')
+        continue
+    fi
+
+    if [[ "$arg" =~ ^--test-types= ]]; then
+        rw_tag=$(echo $arg | cut -d= -f2 | tr ',' '_')
+        continue
+    fi
+
     # append non-processed args
     [ ! -z "$args" ] && args="$args $arg" || args="$arg"
 done
@@ -32,6 +42,7 @@ done
 # iterate iodepth and numjobs
 for iodepth in $iodepth_list; do
     for numjobs in $numjobs_list; do
-        pbench-fio $args --iodepth=$iodepth --numjobs=$numjobs
+        pbench-fio --config=bs_${bs_tag}_iod_${iodepth}_njobs_${numjobs}_${rw_tag} \
+        $args --iodepth=$iodepth --numjobs=$numjobs
     done
 done

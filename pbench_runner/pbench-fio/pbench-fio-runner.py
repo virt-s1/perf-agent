@@ -245,6 +245,12 @@ arguments cannot be overwritten by CLI.')
     LOG.info('Executing the pbench-fio runs...')
     for pbench_fio_run in pbench_fio_runs:
         cmd = 'pbench-fio'
+        
+        # Use bs, iodepth, njobs, r/w type as the config tag
+        pbench_fio_run['config'] = "bs_{}_iod_{}_njobs_{}_{}".format(
+            pbench_fio_run['block-sizes'], pbench_fio_run['iodepth'],
+            pbench_fio_run['numjobs'], pbench_fio_run['test-types'])
+        
         for k, v in pbench_fio_run.items():
             cmd += ' --{}={}'.format(k, v)
 
