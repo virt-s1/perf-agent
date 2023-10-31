@@ -31,7 +31,6 @@
   package:
     name:
       - pbench-agent
-      - pbench-sysstat
     state: latest
 
 - name: Copy local pbench-agent.cfg - cloud
