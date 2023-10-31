@@ -1,5 +1,5 @@
 ---
-coprdistro: "{{ 'centos-stream-9-$basearch'
+coprdistro: "{{ 'epel-9-$basearch'
    if ansible_distribution == 'RedHat' and
    ansible_distribution_major_version == '9'
    else
@@ -21,11 +21,11 @@ coprdistro: "{{ 'centos-stream-9-$basearch'
    'unknown'
    }}"
 
-baseurl: "https://copr-be.cloud.fedoraproject.org/results/ndokos/pbench/{{ coprdistro }}/"
+baseurl: "https://download.copr.fedorainfracloud.org/results/ndokos/pbench-0.73/{{ coprdistro }}/"
 
 testbaseurl: "https://copr-be.cloud.fedoraproject.org/results/ndokos/pbench-test/{{ coprdistro }}/"
 
-gpgkey: "{{ 'https://copr-be.cloud.fedoraproject.org/results/ndokos/pbench/pubkey.gpg' }}"
+gpgkey: "{{ 'https://download.copr.fedorainfracloud.org/results/ndokos/pbench-0.73/pubkey.gpg' }}"
 
 testgpgkey: "{{ 'https://copr-be.cloud.fedoraproject.org/results/ndokos/pbench-test/pubkey.gpg' }}"
 
