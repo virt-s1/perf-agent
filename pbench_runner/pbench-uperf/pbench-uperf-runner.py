@@ -75,7 +75,7 @@ def test_suites(test_suite_name):
         test_types = "stream,maerts,rr,bidirec"
         instances = "1"
         runtime = 10
-        message_sizes = "1,64"
+        message_sizes = "64,1024"
         nr_samples = 3
         max_failures = 3
         maxstddevpct = 5
@@ -85,7 +85,7 @@ def test_suites(test_suite_name):
         test_types = "stream,maerts,rr,bidirec"
         instances = "1,8"
         runtime = 20
-        message_sizes = "1,64,1024"
+        message_sizes = "64,1024,10240"
         nr_samples = 3
         max_failures = 3
         maxstddevpct = 5
@@ -94,8 +94,8 @@ def test_suites(test_suite_name):
         protocols = "tcp,udp"
         test_types = "stream,maerts,rr,bidirec"
         instances = "1,8,64"
-        runtime = 60
-        message_sizes = "1,64,1024,16384"
+        runtime = 30
+        message_sizes = "64,1024,10240,102400"
         nr_samples = 5
         max_failures = 6
         maxstddevpct = 5
