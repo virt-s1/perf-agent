@@ -73,11 +73,11 @@ def test_suites(test_suite_name):
         print("INFO: Run pbench-uperf with quick test suite.")
         protocols = "tcp,udp"
         test_types = "stream,maerts,rr,bidirec"
-        instances = "1"
+        instances = "8"
         runtime = 10
         message_sizes = "64,1024"
         nr_samples = 3
-        max_failures = 3
+        max_failures = 2
         maxstddevpct = 5
     elif test_suite_name == "standard":
         print("INFO: Run pbench-uperf with standard test suite.")
