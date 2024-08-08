@@ -26,6 +26,26 @@
     name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
     disable_gpg_check: yes
     state: present
+  when: ansible_distribution_major_version != "10"
+
+  # currently no epel 10 yet, use epel 9 as workaround
+- name: Install epel repo file for rhel 10
+  yum:
+    name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm"
+    disable_gpg_check: yes
+    state: present
+  when: ansible_distribution_major_version == "10"
+
+- name: Replace $releasever with 9 in epel.repo for rhel 10 as workaround
+  shell: "sed -i 's/\\$releasever/9/g' /etc/yum.repos.d/epel.repo"
+  when: ansible_distribution_major_version == "10"
+
+- name: Replace $releasever with 9 in epel-testing.repo for rhel 10 as workaround
+  shell: "sed -i 's/\\$releasever/9/g' /etc/yum.repos.d/epel-testing.repo"
+  when: ansible_distribution_major_version == "10"
+
+- name: Sleep for 10 seconds
+  shell: "sleep 10"
 
 - name: Install pbench-agent and pbench-sysstat RPMs
   package:
