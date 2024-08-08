@@ -1,7 +1,7 @@
 ---
 coprdistro: "{{ 'epel-9-$basearch'
    if ansible_distribution == 'RedHat' and
-   ansible_distribution_major_version == '9'
+   (ansible_distribution_major_version == '10' or ansible_distribution_major_version == '9') 
    else
    'epel-8-$basearch'
    if ansible_distribution == 'RedHat' and
